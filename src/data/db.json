@@ -1,0 +1,888 @@
+{
+  "profile": {
+    "name": "Manav Shah",
+    "role": "AI Engineer & Software Builder",
+    "tagline": "Building intelligent software, automation systems, and products that solve real-world problems.",
+    "shortBio": "AI Engineer with deep hands-on expertise in LLMs, generative AI pipelines, and applied machine learning. Dedicated to building high-reliability automation systems and end-to-end AI products.",
+    "aboutStory": [
+      "I started my journey with a deep curiosity about how intelligent systems can automate tedious cognitive workflows and turn raw multi-modal data into structured, actionable insights.",
+      "Over the course of my B.Tech in Computer Engineering (Indus University, 9.70 CGPA) and M.Tech in Artificial Intelligence (Pandit Deendayal Energy University, 9.06 CGPA), I focused heavily on deep learning, EEG signal processing, neural network optimization, and computer vision.",
+      "At Analytix Solutions, I spearheaded TaxProGenie, automating 28+ U.S. tax forms for over 1.5 Lakh taxpayers with 98% accuracy using LLM classification, Azure Document Intelligence, and OpenAI/Claude extraction. I also architected AI-VOX and Artifax — systems transforming enterprise speech training and automated meeting documentation into real-world software.",
+      "Today, I combine rigorous research methodology with production-grade engineering to ship reliable, high-impact AI software that feels effortless to use."
+    ],
+    "location": "Ahmedabad, India",
+    "email": "Manavshah052003@gmail.com",
+    "phone": "+91 8128362204",
+    "github": "https://github.com/manavshah052003",
+    "linkedin": "https://linkedin.com/in/manavshah-11ai",
+    "status": "Available for high-impact AI Engineering opportunities",
+    "heroHeadline": "Engineering intelligent systems that turn complex problems into simple products.",
+    "heroSubheadline": "Hands-on in LLMs, RAG, agentic workflows, multi-modal pipelines, and full-stack software architecture.",
+    "philosophies": [
+      {
+        "title": "Build Useful Things",
+        "description": "AI is only as good as the human friction it eliminates. Software must deliver tangible, measurable utility."
+      },
+      {
+        "title": "Keep Systems Simple",
+        "description": "Resist unnecessary complexity. Clean architectures, deterministic fallbacks, and observable pipelines outlive brittle monoliths."
+      },
+      {
+        "title": "Automate Repetitive Work",
+        "description": "Identify manual bottlenecks and replace them with robust, fault-tolerant automated pipelines."
+      },
+      {
+        "title": "Learn & Iterate Continuously",
+        "description": "Stay at the frontier of research papers, benchmark relentlessly, and translate cutting-edge models into production code."
+      }
+    ],
+    "metrics": [
+      {
+        "label": "U.S. Tax Forms Automated",
+        "value": "28+",
+        "helper": "Covering 1.5L+ taxpayers"
+      },
+      {
+        "label": "Batch Processing Speedup",
+        "value": "5x–10x",
+        "helper": "Reduced 5-10m/form to 1-2m/PDF"
+      },
+      {
+        "label": "Model Accuracy in Prod",
+        "value": "98%",
+        "helper": "Standard forms classification"
+      },
+      {
+        "label": "IEEE Research Papers",
+        "value": "2",
+        "helper": "Deep Learning & Biomedical AI"
+      }
+    ],
+    "avatarUrl": "/images/manav-portrait.png"
+  },
+  "projects": [
+    {
+      "id": "taxpro-genie",
+      "slug": "taxpro-genie",
+      "title": "TaxProGenie",
+      "shortDescription": "AI-powered enterprise tax workflow automation processing 28+ U.S. tax forms across 150K+ taxpayers with 98% accuracy.",
+      "fullDescription": "TaxProGenie is an intelligent tax form classification, extraction, and validation pipeline. It automates high-volume U.S. tax return preparation by combining Azure Document Intelligence, custom LLM classification, schema-enforced OpenAI/Claude extraction, and automated Excel reconciliations.",
+      "category": "AI",
+      "featured": true,
+      "status": "Production",
+      "year": "2026",
+      "technologies": [
+        "Python",
+        "OpenAI",
+        "Claude",
+        "Azure Document Intelligence",
+        "FastAPI",
+        "Pandas",
+        "Excel Automation",
+        "NLP"
+      ],
+      "problem": "Tax season manual entry required ~20 tax professionals spending 5–10 minutes per form manually inspecting scans, typing data, and cross-checking IRS rules across hundreds of thousands of taxpayer documents.",
+      "solution": "Engineered an end-to-end multi-stage pipeline: OCR/layout extraction -> multi-modal document classification -> zero-shot field extraction with JSON validation -> cross-field mathematical integrity checks -> direct generation of populated client workbooks.",
+      "architectureSteps": [
+        "Document Ingestion & Multi-page PDF Splitting",
+        "Azure Document Intelligence Layout & Text Parsing",
+        "LLM-based Form Classification (28+ IRS Tax Form Types)",
+        "Prompt-Engineered Structured Key-Value Extraction (Claude / OpenAI)",
+        "Deterministic Validation, Reconciliation & Error Flagging",
+        "Automated Excel Ledger Generation for Tax Professionals"
+      ],
+      "features": [
+        "Batch PDF processing with zero-intervention queue management",
+        "High-precision extraction with 98% standard / 90% non-standard document accuracy",
+        "Discrepancy detection flagging inconsistent calculations before filing",
+        "Multi-tenant workspace supporting high concurrency during tax season"
+      ],
+      "challenges": [
+        "Handling low-resolution scans, handwritten annotations, and rotated pages",
+        "Strict zero-hallucination tolerance for numeric financial data and SSN/EIN fields",
+        "Optimizing API token costs and inference latency during peak batch jobs"
+      ],
+      "engineeringDecisions": [
+        {
+          "decision": "Hybrid OCR + LLM Parsing",
+          "rationale": "Using Azure Doc Intelligence for raw bounding boxes combined with LLMs for semantic reconciliation provided the best accuracy-cost balance."
+        },
+        {
+          "decision": "Strict Pydantic JSON Validation Schema",
+          "rationale": "Guaranteed deterministic structure and eliminated schema drift before Excel injection."
+        }
+      ],
+      "results": [
+        "Reduced turnaround time from 5–10 min/form down to 1–2 min/PDF",
+        "Automated the core tax season workload of a 20-person operations team",
+        "Processed documents for 1.0L – 1.5L taxpayers reliably"
+      ],
+      "lessonsLearned": [
+        "Deterministic validation layers are essential when deploying generative AI in compliance-critical domains.",
+        "Batch queue chunking significantly mitigates rate-limit exhaustion."
+      ],
+      "githubUrl": "https://github.com/manavshah052003",
+      "demoUrl": ""
+    },
+    {
+      "id": "applied-ai-os",
+      "slug": "applied-ai-os",
+      "title": "Applied AI OS",
+      "shortDescription": "An independent AI engineering workspace with 28+ features including Multi-LLM playground, RAG Studio, and observability.",
+      "fullDescription": "Applied AI OS is an end-to-end developer workspace built for AI engineers to prototype, evaluate, benchmark, and observe LLM applications across OpenAI, Anthropic, and Google Gemini with built-in hallucination detection and prompt versioning.",
+      "category": "AI",
+      "featured": true,
+      "status": "Completed",
+      "year": "2025",
+      "technologies": [
+        "Python",
+        "FastAPI",
+        "Streamlit",
+        "LangChain",
+        "OpenAI API",
+        "Anthropic API",
+        "Gemini API",
+        "ChromaDB",
+        "PyTorch"
+      ],
+      "problem": "AI engineers repeatedly rewrite boilerplate for model comparison, prompt versioning, RAG evaluation, token cost estimation, and schema validation across fragmented tools.",
+      "solution": "Designed a unified single-pane-of-glass operating suite featuring a multi-LLM comparison studio, automated prompt regression tester, encrypted API key vault, and token telemetry.",
+      "architectureSteps": [
+        "Unified Multi-Provider API Abstraction Layer (OpenAI / Claude / Gemini)",
+        "Vector Embedding & RAG Pipeline with Semantic Chunking",
+        "Real-time Observability & Token Latency Telemetry Engine",
+        "Hallucination & JSON Auto-Repair Middleware",
+        "Encrypted Local Key Vault with Role-based Context Isolation"
+      ],
+      "features": [
+        "Side-by-side Multi-LLM Playground with unified parameter controls",
+        "Automated RAG research assistant with PDF/document chunking & ChromaDB search",
+        "Deterministic JSON repair middleware preventing downstream crash cascades",
+        "Prompt Studio supporting git-style diffs and A/B benchmarking suites"
+      ],
+      "challenges": [
+        "Normalizing diverging API response structures and streaming protocols across providers",
+        "Implementing low-latency semantic evaluation without inflating API cost"
+      ],
+      "engineeringDecisions": [
+        {
+          "decision": "Provider Adapter Architecture",
+          "rationale": "Allowed plug-and-play addition of open-source and proprietary models without changing interface logic."
+        }
+      ],
+      "results": [
+        "Integrated 28+ modular AI developer utilities into one cohesive platform",
+        "Accelerated internal POC prototyping cycle by 4x"
+      ],
+      "lessonsLearned": [
+        "Standardized evaluation datasets early in the pipeline save dozens of hours in manual prompt tuning."
+      ],
+      "githubUrl": "https://github.com/manavshah052003",
+      "demoUrl": ""
+    },
+    {
+      "id": "ai-vox",
+      "slug": "ai-vox",
+      "title": "AI-VOX Voice Training Platform",
+      "shortDescription": "Speech evaluation platform powered by Gemini TTS & audio ML analyzing pronunciation, fluency, and sentiment at 95% accuracy.",
+      "fullDescription": "AI-VOX is an intelligent speech assessment tool created for HR and L&D teams. It dynamically generates contextual 10-question interview/training sessions, evaluates spoken audio for pronunciation, fluency, vocabulary breadth, and vocal confidence, and generates instant improvement metrics.",
+      "category": "AI",
+      "featured": true,
+      "status": "Production",
+      "year": "2026",
+      "technologies": [
+        "Python",
+        "Gemini TTS",
+        "Speech Recognition",
+        "FastAPI",
+        "Audio Signal Processing",
+        "NLP",
+        "Scikit-learn"
+      ],
+      "problem": "Corporate language training and HR communication assessments relied on manual, subjective 1-on-1 human reviews that could not scale across large employee cohorts.",
+      "solution": "Constructed an automated interactive voice testing suite combining conversational prompting with audio signal feature extraction for objective scoring.",
+      "architectureSteps": [
+        "Dynamic Scenario & Question Generation via LLM",
+        "Gemini TTS Audio Synthesis with Natural Inflections",
+        "Client Audio Capture & Whisper Speech-to-Text Transcription",
+        "Acoustic Feature Extraction (Pitch, Pause Duration, Spectral Flatness)",
+        "NLP Metric Engine (Lexical Diversity, Sentiment & Grammar Scoring)",
+        "Comprehensive Scorecard & Diagnostic Report Generation"
+      ],
+      "features": [
+        "10-question adaptive assessment sessions tailored to enterprise job roles",
+        "Real-time pronunciation, fluency, grammar, and vocabulary scoring",
+        "Sentiment analysis and vocal confidence detection",
+        "Diagnostic audio feedback with phonetic guidance"
+      ],
+      "challenges": [
+        "Filtering background acoustic noise and handling non-native microphone variations",
+        "Calibrating scoring scales to align with certified human evaluator benchmarks"
+      ],
+      "engineeringDecisions": [
+        {
+          "decision": "Combined Acoustic Signal Processing with NLP Text Analysis",
+          "rationale": "Evaluating both the raw audio waveform and the transcript captured true conversational proficiency far better than text alone."
+        }
+      ],
+      "results": [
+        "Tested and validated by 20 HR/L&D professionals across live training batches",
+        "Achieved ~95% correlation with human examiner scoring"
+      ],
+      "lessonsLearned": [
+        "Audio preprocessing (silence trimming and normalization) is crucial for consistent downstream evaluation."
+      ],
+      "githubUrl": "https://github.com/manavshah052003",
+      "demoUrl": ""
+    },
+    {
+      "id": "artifax",
+      "slug": "artifax",
+      "title": "Artifax — Meeting-to-Documentation Pipeline",
+      "shortDescription": "Autonomous pipeline converting video meetings and demos into timestamped Word BRD documentation with flowcharts and key screenshots.",
+      "fullDescription": "Artifax ingests screen-share demo videos and team calls, extracts audio transcripts and visual frame changes, reconstructs step-by-step user workflows, and outputs structured Business Requirement Documents (BRD) complete with contextual screenshots and Mermaid flow diagrams.",
+      "category": "Automation",
+      "featured": true,
+      "status": "Completed",
+      "year": "2026",
+      "technologies": [
+        "Python",
+        "OpenCV",
+        "Whisper",
+        "LLMs",
+        "Mermaid.js",
+        "docx Automation",
+        "Computer Vision"
+      ],
+      "problem": "Engineering teams spent hours manually replaying client handover recordings to write business documentation and architecture diagrams.",
+      "solution": "Built an automated pipeline utilizing keyframe difference analysis, audio-visual alignment, and LLM synthesis to produce publication-ready documentation in minutes.",
+      "architectureSteps": [
+        "Video Ingestion & OpenCV Frame Difference Detection",
+        "Whisper Audio Transcription with Timestamp Alignment",
+        "Visual Keyframe Extraction & UI Bounding Box Highlighting",
+        "LLM Workflow Synthesis & Step Reconstruction",
+        "Mermaid Flowchart Generation",
+        "Formatted Word (.docx) Document Compilation"
+      ],
+      "features": [
+        "Automatic action detection linking transcript lines to matching video frames",
+        "Flow-diagram generation detailing user decision trees and UI navigation",
+        "One-click export to enterprise-formatted Word documents"
+      ],
+      "challenges": [
+        "Preventing redundant screenshots during static slide transitions",
+        "Maintaining precise sync between speech and UI actions"
+      ],
+      "engineeringDecisions": [
+        {
+          "decision": "Structural Similarity Index (SSIM) for Keyframe Deduplication",
+          "rationale": "Drastically reduced image redundancy before prompting the vision model."
+        }
+      ],
+      "results": [
+        "Cut documentation authoring time from 3–4 hours per meeting down to < 10 minutes",
+        "Directly accelerated client handoffs and internal engineering alignment"
+      ],
+      "lessonsLearned": [
+        "Combining visual frame shifts with NLP timestamps provides rich grounding that eliminates hallucinated steps."
+      ],
+      "githubUrl": "https://github.com/manavshah052003",
+      "demoUrl": ""
+    },
+    {
+      "id": "smart-greenhouse",
+      "slug": "smart-greenhouse",
+      "title": "Smart Greenhouse for Automated Mushroom Cultivation",
+      "shortDescription": "Computer vision and IoT automation system with YOLOv8 + ViT deployed on Raspberry Pi 5 with 87% accuracy.",
+      "fullDescription": "Published in ICCNT 2024, this project deployed a dual-model vision pipeline (YOLOv8 object detector + Vision Transformer classifier) onto a Raspberry Pi 5 edge device integrated with temperature/humidity sensors to autonomously monitor mushroom growth stages and regulate greenhouse microclimate.",
+      "category": "Machine Learning",
+      "featured": false,
+      "status": "Completed",
+      "year": "2024",
+      "technologies": [
+        "Python",
+        "YOLOv8",
+        "Vision Transformer (ViT)",
+        "PyTorch",
+        "OpenCV",
+        "Raspberry Pi 5",
+        "IoT Sensors"
+      ],
+      "problem": "Mushroom cultivation is extremely sensitive to humidity and temperature; manual monitoring causes delayed interventions and high crop yield loss.",
+      "solution": "Built an edge IoT system using computer vision to track growth cycles and trigger misting/ventilation actuators automatically.",
+      "architectureSteps": [
+        "Pi Camera Image Capture & Environmental Telemetry Sampling",
+        "Edge YOLOv8 Detection for Mushroom Cap Localization",
+        "Vision Transformer (ViT) Stage Classification",
+        "Microcontroller Feedback Loop for Climate Regulation",
+        "Cloud Telemetry Logging & Real-time Alerting"
+      ],
+      "features": [
+        "On-device inference running optimized quantized weights",
+        "Custom dataset of 2,000+ manually annotated mushroom growth images",
+        "Closed-loop actuator automation for temperature & humidity"
+      ],
+      "challenges": [
+        "Overcoming extreme lighting and mist condensation inside the greenhouse chamber",
+        "Optimizing ViT latency on constrained edge hardware"
+      ],
+      "engineeringDecisions": [
+        {
+          "decision": "YOLOv8 for ROI Cropping prior to ViT Inference",
+          "rationale": "Allowed lightweight cap segmentation before running deep classification, optimizing edge compute."
+        }
+      ],
+      "results": [
+        "Achieved ~87% accuracy on real-world greenhouse test batches",
+        "Published and presented research at ICCNT 2024"
+      ],
+      "lessonsLearned": [
+        "Domain-specific data augmentation is critical for edge vision robustness in variable environments."
+      ],
+      "githubUrl": "https://github.com/manavshah052003",
+      "demoUrl": ""
+    }
+  ],
+  "experience": [
+    {
+      "id": "analytix-associate-ai",
+      "company": "Analytix Solutions",
+      "role": "Associate AI Developer",
+      "location": "Ahmedabad, India",
+      "startDate": "May 2026",
+      "endDate": "Present",
+      "current": true,
+      "description": "Leading client-facing AI development, LLM engineering, and automated enterprise document workflows.",
+      "responsibilities": [
+        "Architected and owned TaxProGenie, automating 28+ U.S. tax forms across 100K–150K taxpayers using LLM classification, Azure Document Intelligence, OpenAI/Claude extraction, validation, and Excel automation.",
+        "Achieved 98% standard / 90% non-standard document accuracy, reducing 5–10 min/form processing down to 1–2 min/PDF.",
+        "Built AI-VOX: Gemini TTS voice-training platform tested by 20 HR/L&D employees, evaluating pronunciation, fluency, vocabulary, confidence, and sentiment at ~95% accuracy.",
+        "Execute AI model R&D, prompt engineering, API integration, fine-tuning, benchmarking, evaluation, code reviews, and production deployments."
+      ],
+      "technologies": [
+        "Python",
+        "FastAPI",
+        "OpenAI API",
+        "Claude API",
+        "Azure Document Intelligence",
+        "Gemini TTS",
+        "NLP",
+        "Pandas",
+        "Excel Automation"
+      ],
+      "achievements": [
+        "Automated a ~20-person tax-season workflow, eliminating repetitive manual data entry.",
+        "Achieved 98% extraction accuracy on complex IRS tax schedules."
+      ],
+      "associatedProjects": [
+        "taxpro-genie",
+        "ai-vox"
+      ]
+    },
+    {
+      "id": "analytix-intern",
+      "company": "Analytix Solutions",
+      "role": "AI Engineer Intern",
+      "location": "Ahmedabad, India",
+      "startDate": "Nov 2025",
+      "endDate": "May 2026",
+      "current": false,
+      "description": "Developed multi-modal pipelines converting video demos and meetings into structured business documentation.",
+      "responsibilities": [
+        "Built Artifax: an AI meeting-to-documentation pipeline that converts video recordings and demos into timestamped Word BRD documents.",
+        "Extracted audio, key workflow steps, and contextual screenshots with OpenCV and Whisper.",
+        "Automated step-by-step workflow reconstruction and flow-diagram generation linked to exact video timestamps."
+      ],
+      "technologies": [
+        "Python",
+        "OpenCV",
+        "Whisper",
+        "LLMs",
+        "Mermaid.js",
+        "docx Automation"
+      ],
+      "achievements": [
+        "Reconstructed full technical flow diagrams directly from screen recordings.",
+        "Reduced process documentation creation time by over 75%."
+      ],
+      "associatedProjects": [
+        "artifax"
+      ]
+    },
+    {
+      "id": "schbang-intern",
+      "company": "Schbang",
+      "role": "AI Development Intern",
+      "location": "Remote",
+      "startDate": "Jun 2025",
+      "endDate": "Aug 2025",
+      "current": false,
+      "description": "Constructed creative AI agents and cross-modal transformation pipelines for multimedia automation.",
+      "responsibilities": [
+        "Developed AI agents for automated video analysis, categorization, and multimedia web-scraping pipelines.",
+        "Built cross-modal image-to-video transformation workflows for generative creative applications.",
+        "Engineered automated content tagging and metadata enrichment pipelines."
+      ],
+      "technologies": [
+        "Python",
+        "Generative AI",
+        "Computer Vision",
+        "Web Scraping",
+        "Video Processing",
+        "AI Agents"
+      ],
+      "achievements": [
+        "Streamlined multi-source multimedia scraping and automated video categorization pipelines."
+      ],
+      "associatedProjects": []
+    }
+  ],
+  "skills": [
+    {
+      "category": "AI & Generative AI",
+      "description": "Core competencies in Large Language Models, agentic workflows, and semantic search.",
+      "skills": [
+        {
+          "name": "LLMs & Prompt Engineering",
+          "level": "Primary",
+          "years": "2+"
+        },
+        {
+          "name": "RAG Architectures",
+          "level": "Primary",
+          "years": "2+"
+        },
+        {
+          "name": "LLM Evaluation & Benchmarking",
+          "level": "Primary",
+          "years": "2+"
+        },
+        {
+          "name": "AI Agents & Tool Calling",
+          "level": "Primary",
+          "years": "1.5+"
+        },
+        {
+          "name": "Vector Databases (ChromaDB / Pinecone)",
+          "level": "Advanced",
+          "years": "2+"
+        },
+        {
+          "name": "Azure Document Intelligence",
+          "level": "Primary",
+          "years": "1.5+"
+        },
+        {
+          "name": "OpenAI, Anthropic & Gemini APIs",
+          "level": "Primary",
+          "years": "2+"
+        }
+      ]
+    },
+    {
+      "category": "Machine Learning & Deep Learning",
+      "description": "Classical ML, neural architectures, computer vision, and biomedical signal processing.",
+      "skills": [
+        {
+          "name": "PyTorch",
+          "level": "Primary",
+          "years": "2+"
+        },
+        {
+          "name": "TensorFlow / Keras",
+          "level": "Working Knowledge",
+          "years": "2+"
+        },
+        {
+          "name": "Scikit-learn",
+          "level": "Primary",
+          "years": "3+"
+        },
+        {
+          "name": "Computer Vision (OpenCV, YOLOv8, ViT)",
+          "level": "Advanced",
+          "years": "2+"
+        },
+        {
+          "name": "NLP & Text Classification",
+          "level": "Primary",
+          "years": "2+"
+        },
+        {
+          "name": "Signal Processing (EEG / Bio-signals)",
+          "level": "Advanced",
+          "years": "2+"
+        }
+      ]
+    },
+    {
+      "category": "Backend & Engineering",
+      "description": "Production API design, asynchronous processing, and automated data pipelines.",
+      "skills": [
+        {
+          "name": "Python",
+          "level": "Primary",
+          "years": "4+"
+        },
+        {
+          "name": "FastAPI",
+          "level": "Primary",
+          "years": "2+"
+        },
+        {
+          "name": "SQL & Database Design",
+          "level": "Advanced",
+          "years": "3+"
+        },
+        {
+          "name": "C++",
+          "level": "Working Knowledge",
+          "years": "3+"
+        },
+        {
+          "name": "REST APIs & Webhooks",
+          "level": "Primary",
+          "years": "3+"
+        },
+        {
+          "name": "Pandas & Data Wrangling",
+          "level": "Primary",
+          "years": "3+"
+        }
+      ]
+    },
+    {
+      "category": "Frontend & Modern Web",
+      "description": "Full-stack user experiences, dashboards, and responsive web products.",
+      "skills": [
+        {
+          "name": "TypeScript / JavaScript",
+          "level": "Advanced",
+          "years": "2+"
+        },
+        {
+          "name": "Next.js & React",
+          "level": "Advanced",
+          "years": "2+"
+        },
+        {
+          "name": "Streamlit",
+          "level": "Primary",
+          "years": "2+"
+        },
+        {
+          "name": "HTML5 & Modern CSS (Vanilla / Tokens)",
+          "level": "Advanced",
+          "years": "3+"
+        }
+      ]
+    },
+    {
+      "category": "DevOps & Tooling",
+      "description": "Deployment, version control, edge computing, and workflow automation.",
+      "skills": [
+        {
+          "name": "Git & GitHub",
+          "level": "Primary",
+          "years": "4+"
+        },
+        {
+          "name": "Docker",
+          "level": "Working Knowledge",
+          "years": "1.5+"
+        },
+        {
+          "name": "Linux / Shell Scripting",
+          "level": "Advanced",
+          "years": "3+"
+        },
+        {
+          "name": "Raspberry Pi / Edge AI",
+          "level": "Advanced",
+          "years": "2+"
+        },
+        {
+          "name": "CI/CD & Cloud Deployments",
+          "level": "Working Knowledge",
+          "years": "1.5+"
+        }
+      ]
+    }
+  ],
+  "education": [
+    {
+      "id": "pdeu-mtech",
+      "institution": "Pandit Deendayal Energy University (PDEU)",
+      "degree": "M.Tech",
+      "field": "Artificial Intelligence",
+      "startYear": "2024",
+      "endYear": "2026",
+      "grade": "CGPA: 9.06 / 10.0",
+      "location": "Gandhinagar, Gujarat, India",
+      "description": "Specialized in Deep Learning, EEG signal classification, Generative AI models, and biomedical signal processing.",
+      "highlights": [
+        "Published 2 IEEE research papers on neural network architectures for sleep analysis",
+        "Research Team Lead: Mentored junior scholars on research design and paper drafting",
+        "Teaching Assistant: Guided undergraduate students through complex technical AI subjects"
+      ],
+      "subjects": [
+        "Deep Learning",
+        "Generative AI",
+        "Computer Vision",
+        "Advanced NLP",
+        "Neural Engineering",
+        "Reinforcement Learning"
+      ]
+    },
+    {
+      "id": "indus-btech",
+      "institution": "Indus University",
+      "degree": "B.Tech",
+      "field": "Computer Engineering",
+      "startYear": "2021",
+      "endYear": "2024",
+      "grade": "CGPA: 9.70 / 10.0",
+      "location": "Ahmedabad, Gujarat, India",
+      "description": "Rigorous foundation in computer science, algorithms, software engineering, databases, and applied machine learning.",
+      "highlights": [
+        "Graduated with top academic standing (9.70 CGPA)",
+        "Published IoT & Edge Computer Vision research at ICCNT 2024",
+        "Led multiple university hackathon & software development teams"
+      ],
+      "subjects": [
+        "Data Structures & Algorithms",
+        "Operating Systems",
+        "Database Management",
+        "Machine Learning",
+        "Computer Networks",
+        "Software Engineering"
+      ]
+    }
+  ],
+  "certifications": [
+    {
+      "id": "genai-cert",
+      "name": "Generative AI Engineering & LLM Architecture",
+      "issuer": "DeepLearning.AI / Coursera",
+      "date": "2025",
+      "credentialId": "GENAI-782910-MS",
+      "credentialUrl": "https://coursera.org",
+      "skills": [
+        "LLMs",
+        "RAG",
+        "Prompt Engineering",
+        "LangChain",
+        "Vector DBs"
+      ]
+    },
+    {
+      "id": "azure-ai-cert",
+      "name": "Azure AI & Document Intelligence Specialist",
+      "issuer": "Microsoft",
+      "date": "2025",
+      "credentialId": "MS-AZ-AI-99412",
+      "credentialUrl": "https://learn.microsoft.com",
+      "skills": [
+        "Azure Document Intelligence",
+        "Cloud AI Services",
+        "OCR",
+        "Form Processing"
+      ]
+    },
+    {
+      "id": "deep-learning-cert",
+      "name": "Deep Learning Specialization",
+      "issuer": "DeepLearning.AI",
+      "date": "2024",
+      "credentialId": "DL-SPEC-44312",
+      "credentialUrl": "https://deeplearning.ai",
+      "skills": [
+        "PyTorch",
+        "Neural Networks",
+        "CNNs",
+        "Sequence Models",
+        "Optimization"
+      ]
+    }
+  ],
+  "achievements": [
+    {
+      "id": "ieee-eegnet",
+      "title": "IEEE Publication: EEGNet-BiLSTM with Gated Fusion for Sleep Stage Classification",
+      "date": "2025",
+      "category": "Publication",
+      "description": "Designed EEGNet-BiLSTM with gated fusion for cross-subject and cross-age sleep-stage classification, achieving 88.02% accuracy with state-of-the-art comparative benchmarks.",
+      "metrics": "88.02% Accuracy"
+    },
+    {
+      "id": "ieee-deepboost",
+      "title": "IEEE Publication: DeepBoost — Multi-Stage Deep Feature Extraction for Sleep Apnea Detection",
+      "date": "2025",
+      "category": "Publication",
+      "description": "Developed LSTM/RNN + XGBoost decision fusion for automated sleep apnea detection from biomedical signals, achieving 90% accuracy.",
+      "metrics": "90% Accuracy"
+    },
+    {
+      "id": "iccnt-mushroom",
+      "title": "ICCNT 2024: Automated Smart Greenhouse with YOLOv8 & ViT",
+      "date": "2024",
+      "category": "Publication",
+      "description": "Published and presented edge computer vision research for automated mushroom cultivation on Raspberry Pi 5 with ~87% accuracy.",
+      "metrics": "87% Accuracy"
+    },
+    {
+      "id": "research-lead",
+      "title": "Research Team Lead — M.Tech AI",
+      "date": "2024–2026",
+      "category": "Leadership",
+      "description": "Mentored and guided junior researchers on paper organization, experimental setup, model evaluation, and academic writing."
+    },
+    {
+      "id": "teaching-asst",
+      "title": "Teaching Assistant — PDEU",
+      "date": "2024–2026",
+      "category": "Leadership",
+      "description": "Taught B.Tech engineering students, evaluated assignments, and led doubt-clearing sessions for complex AI and data science courses."
+    }
+  ],
+  "services": [
+    {
+      "id": "ai-systems",
+      "title": "AI Systems & LLM Applications",
+      "tagline": "Custom generative AI architectures, RAG systems, and semantic search.",
+      "description": "Designing and deploying reliable production LLM pipelines with structured outputs, hallucination detection, prompt evaluation, and vector retrieval.",
+      "capabilities": [
+        "Retrieval-Augmented Generation (RAG) with semantic chunking",
+        "Multi-modal document intelligence and schema extraction",
+        "LLM evaluation, guardrails, and deterministic validation",
+        "Fine-tuning, prompt studio optimization, and agentic workflows"
+      ],
+      "technologies": [
+        "OpenAI",
+        "Claude",
+        "Gemini",
+        "LangChain",
+        "ChromaDB",
+        "Pydantic"
+      ],
+      "icon": "Brain"
+    },
+    {
+      "id": "business-automation",
+      "title": "Enterprise Workflow Automation",
+      "tagline": "Replacing repetitive, manual cognitive workflows with software.",
+      "description": "End-to-end automation pipelines that turn unstructured documents, forms, emails, and meetings into validated data and structured deliverables.",
+      "capabilities": [
+        "High-volume PDF and tax form batch processing",
+        "Automated meeting-to-documentation synthesis (BRDs, flowcharts)",
+        "Automated Excel ledger generation and financial reconciliation",
+        "OCR and tabular data extraction with 95%+ accuracy"
+      ],
+      "technologies": [
+        "Python",
+        "Azure Document Intelligence",
+        "OpenCV",
+        "FastAPI",
+        "Pandas"
+      ],
+      "icon": "Workflow"
+    },
+    {
+      "id": "fullstack-products",
+      "title": "Full-Stack Software Engineering",
+      "tagline": "Clean frontend interfaces backed by robust APIs and database layers.",
+      "description": "Building responsive, high-performance web applications, developer tools, and internal company dashboards from concept to production.",
+      "capabilities": [
+        "Modern Next.js & React single-page and server-rendered apps",
+        "RESTful API design with FastAPI and Node.js",
+        "Relational and vector database modeling",
+        "Containerized deployment and CI/CD pipelines"
+      ],
+      "technologies": [
+        "Next.js",
+        "TypeScript",
+        "FastAPI",
+        "SQLite / PostgreSQL",
+        "Docker"
+      ],
+      "icon": "Layers"
+    },
+    {
+      "id": "computer-vision",
+      "title": "Computer Vision & Edge ML",
+      "tagline": "Real-time object detection, classification, and edge hardware deployment.",
+      "description": "Training and optimizing custom deep learning vision models for deployment on edge devices like Raspberry Pi or cloud microservices.",
+      "capabilities": [
+        "Custom dataset annotation and YOLOv8 / ViT training",
+        "Video frame analysis and structural similarity detection",
+        "Edge deployment with quantized weights and IoT sensor fusion",
+        "Speech audio feature extraction and conversational scoring"
+      ],
+      "technologies": [
+        "PyTorch",
+        "YOLOv8",
+        "Vision Transformers",
+        "OpenCV",
+        "Raspberry Pi"
+      ],
+      "icon": "Eye"
+    }
+  ],
+  "notes": [
+    {
+      "id": "deterministic-llm-pipelines",
+      "slug": "deterministic-llm-pipelines",
+      "title": "Building Deterministic AI Pipelines for Regulated Financial Workflows",
+      "excerpt": "How we achieved 98% accuracy processing 150,000+ U.S. tax returns without hallucination risks using schema enforcement and OCR bounding boxes.",
+      "content": "\n# Building Deterministic AI Pipelines for Regulated Financial Workflows\n\nWhen deploying Generative AI into compliance-heavy spaces like tax return preparation, the standard advice of \"just write a better prompt\" fails quickly. Here are the architectural principles we used to build TaxProGenie.\n\n## 1. Grounding in Bounding Box Layouts\nNever ask an LLM to \"read\" an entire multi-page scan blindly. We use Azure Document Intelligence to convert visual pixels into structured tokens with coordinate bounding boxes first.\n\n## 2. Pydantic-First Schema Enforcement\nEvery extraction query targets an explicit Pydantic model. If a field fails type validation, mathematical integrity checks, or IRS formatting rules, it is immediately flagged for automated retry or human review before touching any spreadsheet.\n\n## 3. Mathematical Reconciliation Layers\nLLMs are notoriously weak at cross-row summing across complex multi-tier tables. We delegate all arithmetic to deterministic Python modules.\n\n## Conclusion\nProduction AI is 20% prompt engineering and 80% defensive software architecture.\n    ",
+      "date": "2026-06-15",
+      "readingTime": "5 min read",
+      "tags": [
+        "AI Engineering",
+        "LLMs",
+        "Automation",
+        "Production"
+      ],
+      "published": true
+    },
+    {
+      "id": "eeg-signal-classification",
+      "slug": "eeg-signal-classification",
+      "title": "Deep Feature Fusion for Cross-Subject EEG Sleep Stage Classification",
+      "excerpt": "Key takeaways from our IEEE publication combining EEGNet and BiLSTM networks with gated fusion mechanisms.",
+      "content": "\n# Deep Feature Fusion for Cross-Subject EEG Sleep Stage Classification\n\nBiomedical signal processing requires capturing both fine-grained temporal dynamics and high-level morphological wave patterns.\n\n## The Architecture\nOur model fuses:\n- **Spatial Filters**: Lightweight depthwise separable convolutions to capture electrode channel correlations.\n- **BiLSTM Temporal Memory**: Bidirectional LSTM layers to preserve long-range sleep cycle transitions.\n- **Gated Fusion Unit**: Dynamically weights spatial vs. sequential feature representations.\n\nAchieving 88.02% cross-subject accuracy proved that gated fusion mitigates individual subject variance effectively.\n    ",
+      "date": "2025-11-20",
+      "readingTime": "6 min read",
+      "tags": [
+        "Deep Learning",
+        "PyTorch",
+        "Research",
+        "IEEE"
+      ],
+      "published": true
+    }
+  ],
+  "messages": [
+    {
+      "name": "Recruiter Lead",
+      "email": "recruiter@topcompany.com",
+      "company": "AI Frontier Labs",
+      "subject": "Senior AI Engineer Opportunity",
+      "message": "We reviewed your TaxProGenie and EEGNet research papers and would love to discuss an AI Engineer position.",
+      "id": "msg-1788346991990",
+      "createdAt": "2026-09-02T11:03:11.990Z",
+      "status": "unread"
+    }
+  ],
+  "settings": {
+    "siteTitle": "Manav Shah — AI Engineer & Software Builder",
+    "defaultTheme": "dark",
+    "accentColorLight": "#4F46E5",
+    "accentColorDark": "#818CF8",
+    "assistantWelcome": "Hello! I am Manav's local portfolio assistant. Ask me anything about his production AI projects, work at Analytix Solutions, research publications, or education.",
+    "metaDescription": "Portfolio of Manav Shah – AI Engineer building intelligent production systems.",
+    "footerText": "© 2026 Manav Shah. Engineered with precision.",
+    "googleAnalyticsId": "",
+    "resumeUrl": "/resume/Manav_Shah_Resume.pdf"
+  }
+}

@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Manav Shah — AI Engineer Portfolio & CMS
 
-## Getting Started
+A portfolio website and CMS built with **Next.js 16 (App Router)**, **React 19**, **TypeScript**, and modern **Vanilla CSS**.
 
-First, run the development server:
+---
+
+## 🚀 Live Demo & Deployment
+
+This project is optimized for deployment on **Vercel** with zero configuration required.
+
+### Deploy to Vercel (1-Click)
+1. Push this repository to your GitHub account:
+   ```bash
+   git add .
+   git commit -m "feat: complete portfolio, admin CMS & AI assistant"
+   git branch -M main
+   git remote add origin https://github.com/YOUR_USERNAME/YOUR_REPO_NAME.git
+   git push -u origin main
+   ```
+2. Go to [Vercel](https://vercel.com/new).
+3. Import your GitHub repository.
+4. Click **Deploy** — Vercel will automatically detect Next.js and build all routes.
+
+---
+
+## 🌟 Key Features
+
+- **Developer X Editorial Design**: Frameless transparent AI cutout portrait, custom typography tokens, smooth theme toggling, and interactive micro-animations.
+- **Local AI Portfolio Assistant**: Offline natural language query engine with zero external LLM API dependencies, granular intent detection, and markdown formatting.
+- **Full Admin CMS (`/admin`)**: Password-protected dashboard to manage Profile, Projects, Experience, Skills, Education, Certifications, Achievements, Services, Notes, Messages, and Site Settings.
+- **Interactive Web CV + PDF Viewer**: Dual-mode curriculum vitae viewer with responsive layout.
+- **Dynamic Skills Page**: Dedicated page with technology vector logos and proficiency levels.
+- **Work Experience Timeline Tree**: Connected timeline tree for enterprise roles and internships.
+
+---
+
+## 🔐 Admin Dashboard Credentials
+
+- **Route**: `/admin` (Redirects unauthenticated users to `/admin/login`)
+- **Email**: `manav@gmail.com`
+- **Password**: `manav@1234`
+
+---
+
+## 🛠 Local Development
 
 ```bash
+# Install dependencies
+npm install
+
+# Run local development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build for production
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📄 License
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT &copy; 2026 Manav Shah. Engineered with precision.
