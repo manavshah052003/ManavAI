@@ -40,6 +40,7 @@ export async function POST(req: NextRequest) {
       success: true,
       emailSent: emailResult.success,
       provider: emailResult.provider,
+      emailError: emailResult.error,
       message: savedMessage
     });
   } catch (error) {
