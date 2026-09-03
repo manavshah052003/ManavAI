@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import styles from '../admin.module.css';
 import { Card } from '@/components/ui/Card';
 import { Button } from '@/components/ui/Button';
@@ -24,7 +24,7 @@ interface UploadResult {
 }
 
 export function ChatbotAdminClient() {
-  const [testQuery, setTestQuery] = useState('What AI projects has Manav built?');
+  const [testQuery, setTestQuery] = useState('');
   const [testResult, setTestResult] = useState<AssistantResponse | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -51,6 +51,11 @@ export function ChatbotAdminClient() {
       setIndexLoading(false);
     }
   };
+
+  // Load stats on mount
+  useEffect(() => {
+    fetchIndexStats();
+  }, []);
 
   const handleUpload = async () => {
     if (uploadFiles.length === 0) return;
@@ -333,39 +338,13 @@ export function ChatbotAdminClient() {
             value={testQuery}
             onChange={(e) => setTestQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleTest()}
-            placeholder="Type test query..."
+            placeholder="Ask any dynamic question (e.g. from a recruiter)..."
           />
           <Button onClick={handleTest} variant="primary" size="md" disabled={loading}>
             {loading ? 'Evaluating...' : 'Run Query'}
           </Button>
         </div>
 
-        {/* Quick test buttons */}
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--space-1)', marginBottom: 'var(--space-6)' }}>
-          {[
-            'What AI projects has Manav built?',
-            'What is his current role at Analytix Solutions?',
-            'Tell me about TaxProGenie',
-            'What research papers has he published?',
-            'Does he know Python and PyTorch?',
-          ].map((q) => (
-            <button
-              key={q}
-              onClick={() => setTestQuery(q)}
-              style={{
-                fontSize: 'var(--text-xs)',
-                padding: '3px var(--space-2)',
-                borderRadius: 'var(--radius-sm)',
-                background: 'var(--color-bg-secondary)',
-                border: '1px solid var(--color-border-primary)',
-                color: 'var(--color-text-secondary)',
-                cursor: 'pointer',
-              }}
-            >
-              {q}
-            </button>
-          ))}
-        </div>
 
         {testResult && (
           <div style={{ padding: 'var(--space-4)', background: 'var(--color-bg-secondary)', borderRadius: 'var(--radius-lg)', border: '1px solid var(--color-border-primary)' }}>

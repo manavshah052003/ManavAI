@@ -190,21 +190,6 @@ export default async function HomePage() {
             <Button href="/ask" variant="primary" size="lg">
               Ask Manav&apos;s Assistant
             </Button>
-
-            <div className={styles.assistant__suggestions}>
-              <Link href="/ask?q=What+AI+projects+has+Manav+built%3F" className={styles.assistant__suggestion}>
-                &ldquo;What AI projects has Manav built?&rdquo;
-              </Link>
-              <Link href="/ask?q=Tell+me+about+TaxProGenie" className={styles.assistant__suggestion}>
-                &ldquo;Tell me about TaxProGenie&rdquo;
-              </Link>
-              <Link href="/ask?q=What+is+Manav%27s+current+role%3F" className={styles.assistant__suggestion}>
-                &ldquo;What is Manav&apos;s current role?&rdquo;
-              </Link>
-              <Link href="/ask?q=What+research+papers+has+he+published%3F" className={styles.assistant__suggestion}>
-                &ldquo;What research papers has he published?&rdquo;
-              </Link>
-            </div>
           </div>
         </section>
       </ScrollReveal>

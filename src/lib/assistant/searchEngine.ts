@@ -52,14 +52,8 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
   const query = rawQuery.trim().toLowerCase();
   if (!query) {
     return {
-      answer: "Hi! 👋 I'm Manav's local portfolio assistant. Ask me about his AI projects, work experience, skills, education, or research.",
-      sources: [],
-      suggestedFollowUps: [
-        "What AI projects has Manav built?",
-        "What is Manav's current role?",
-        "Tell me about TaxProGenie.",
-        "What research papers has he published?"
-      ]
+      answer: "Hi! 👋 I'm Manav's local portfolio assistant. Ask me anything about his AI projects, work experience, skills, education, or research.",
+      sources: []
     };
   }
 
@@ -92,11 +86,6 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
           category: 'Contact',
           snippet: `${profile.email} | ${profile.location}`
         }
-      ],
-      suggestedFollowUps: [
-        "What is Manav's current experience?",
-        "View his top AI projects",
-        "How can I download his resume?"
       ]
     };
   }
@@ -114,11 +103,6 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
           snippet: 'AI Engineer | Generative AI | LLMs',
           url: '/resume'
         }
-      ],
-      suggestedFollowUps: [
-        "What technologies does he work with?",
-        "Tell me about his work at Analytix Solutions",
-        "Show me his AI projects"
       ]
     };
   }
@@ -142,12 +126,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
           category: 'Education',
           snippet: `${btech.grade} | ${btech.location}`,
           url: '/education'
-        }],
-        suggestedFollowUps: [
-          "Where did he do his MTech?",
-          "What research papers has he published?",
-          "What are his core skills?"
-        ]
+        }]
       };
     }
   }
@@ -163,12 +142,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
           category: 'Education',
           snippet: `${mtech.grade} | ${mtech.location}`,
           url: '/education'
-        }],
-        suggestedFollowUps: [
-          "Where did he do his BTech?",
-          "What IEEE papers has he published?",
-          "What is his current role?"
-        ]
+        }]
       };
     }
   }
@@ -183,12 +157,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
         category: 'Education',
         snippet: e.grade,
         url: '/education'
-      })),
-      suggestedFollowUps: [
-        "What research papers has he published?",
-        "What are his core technical skills?",
-        "What projects did he build?"
-      ]
+      }))
     };
   }
 
@@ -205,8 +174,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
       if (pdeu) {
         return {
           answer: `At **${pdeu.institution}**, Manav completed his **${pdeu.degree} in ${pdeu.field}** with **${pdeu.grade}** (${pdeu.startYear}–${pdeu.endYear}).${pdeu.highlights && pdeu.highlights.length > 0 ? `\n\n**Highlights**: ${pdeu.highlights.join(', ')}` : ''}`,
-          sources: [{ title: `${pdeu.degree} — ${pdeu.institution}`, category: 'Education', snippet: pdeu.grade, url: '/education' }],
-          suggestedFollowUps: ["Where did he do BTech?", "What research papers?", "Core skills?"]
+          sources: [{ title: `${pdeu.degree} — ${pdeu.institution}`, category: 'Education', snippet: pdeu.grade, url: '/education' }]
         };
       }
     }
@@ -215,8 +183,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
       if (indus) {
         return {
           answer: `At **${indus.institution}**, Manav completed his **${indus.degree} in ${indus.field}** with **${indus.grade}** (${indus.startYear}–${indus.endYear}).${indus.highlights && indus.highlights.length > 0 ? `\n\n**Highlights**: ${indus.highlights.join(', ')}` : ''}`,
-          sources: [{ title: `${indus.degree} — ${indus.institution}`, category: 'Education', snippet: indus.grade, url: '/education' }],
-          suggestedFollowUps: ["Where did he do MTech?", "What are his skills?", "What projects?"]
+          sources: [{ title: `${indus.degree} — ${indus.institution}`, category: 'Education', snippet: indus.grade, url: '/education' }]
         };
       }
     }
@@ -232,12 +199,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
         category: 'Education',
         snippet: `${e.grade} | ${e.location}`,
         url: '/education'
-      })),
-      suggestedFollowUps: [
-        "What research papers has he published?",
-        "What are his core technical skills?",
-        "What projects did he build during university?"
-      ]
+      }))
     };
   }
 
@@ -265,12 +227,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
         category: 'Research Publication',
         snippet: r.description,
         url: '/achievements'
-      })),
-      suggestedFollowUps: [
-        "What deep learning frameworks does he use?",
-        "Tell me about the Smart Greenhouse project",
-        "View his work experience"
-      ]
+      }))
     };
   }
 
@@ -290,12 +247,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
           category: 'Experience',
           snippet: `${currentExp.startDate} – Present | ${currentExp.location}`,
           url: '/experience'
-        }],
-        suggestedFollowUps: [
-          "Tell me about TaxProGenie",
-          "What internships has he done?",
-          "What AI technologies does he use?"
-        ]
+        }]
       };
     }
   }
@@ -314,12 +266,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
           category: 'Experience',
           snippet: `${e.startDate} – ${e.endDate}`,
           url: '/experience'
-        })),
-        suggestedFollowUps: [
-          "What is his current role?",
-          "What projects did he build?",
-          "What are his core skills?"
-        ]
+        }))
       };
     }
   }
@@ -347,12 +294,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
         category: 'Experience',
         snippet: `${exp.startDate} – ${exp.endDate} | ${exp.location}`,
         url: '/experience'
-      })),
-      suggestedFollowUps: [
-        "Tell me about TaxProGenie",
-        "Tell me about AI-VOX",
-        "What AI technologies does he work with?"
-      ]
+      }))
     };
   }
 
@@ -380,11 +322,6 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
           snippet: matchedProject.shortDescription,
           url: `/projects/${matchedProject.slug}`
         }
-      ],
-      suggestedFollowUps: [
-        "View the full case study",
-        "What other AI projects has he built?",
-        "What technologies does he specialize in?"
       ]
     };
   }
@@ -407,12 +344,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
         category: p.category,
         snippet: p.shortDescription,
         url: `/projects/${p.slug}`
-      })),
-      suggestedFollowUps: [
-        "Tell me about TaxProGenie",
-        "Tell me about Applied AI OS",
-        "Tell me about AI-VOX"
-      ]
+      }))
     };
   }
 
@@ -442,12 +374,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
         if (skill) {
           return {
             answer: `Yes! Manav has **${skill.level}** proficiency in **${skill.name}**.\n\nIt falls under his **${cat.category}** skill set${skill.years ? ` with ${skill.years} of experience` : ''}.\n\n**Other skills in ${cat.category}:**\n${cat.skills.filter(s => s.name !== skill.name).map(s => `• ${s.name} (${s.level})`).join('\n')}`,
-            sources: [{ title: cat.category, category: 'Skills', snippet: cat.skills.map(s => s.name).join(', '), url: '/skills' }],
-            suggestedFollowUps: [
-              "What projects use this technology?",
-              "Show all his skills",
-              "What is his current role?"
-            ]
+            sources: [{ title: cat.category, category: 'Skills', snippet: cat.skills.map(s => s.name).join(', '), url: '/skills' }]
           };
         }
       }
@@ -467,12 +394,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
         category: 'Skill Category',
         snippet: cat.skills.map((s) => s.name).join(', '),
         url: '/skills'
-      })),
-      suggestedFollowUps: [
-        "Show projects using Python and LLMs",
-        "What is his experience with Azure?",
-        "What frameworks does he use?"
-      ]
+      }))
     };
   }
 
@@ -495,11 +417,6 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
           snippet: profile.shortBio,
           url: '/about'
         }
-      ],
-      suggestedFollowUps: [
-        "What projects has he built?",
-        "What are his core technical skills?",
-        "How can I contact him?"
       ]
     };
   }
@@ -519,17 +436,34 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
         category: 'Service',
         snippet: s.tagline,
         url: '/services'
-      })),
-      suggestedFollowUps: [
-        "How can I contact him?",
-        "What projects has he built?",
-        "What is his hourly rate?"
-      ]
+      }))
     };
   }
 
   // ──────────────────────────────────────────────
-  // 11. FALLBACK — Semantic Token Overlap
+  // 11. PDF KNOWLEDGE BASE — BM25 Vector Search
+  // ──────────────────────────────────────────────
+  // High priority search across any uploaded documents (Resume, Project deep-dives, IEEE papers, Certs, etc.)
+  if (hasKnowledgeIndex()) {
+    const results = searchKnowledgeIndex(rawQuery, 3, 0.4);
+    if (results.length > 0) {
+      const combinedText = results
+        .map(r => r.chunk.text)
+        .join('\n\n---\n\n');
+
+      return {
+        answer: `Based on Manav's verified documents:\n\n${combinedText}`,
+        sources: results.map(r => ({
+          title: r.chunk.source.replace(/\.pdf$/i, ''),
+          category: `Document (Page ${r.chunk.pageNumber ?? '?'})`,
+          snippet: r.chunk.text.slice(0, 140) + '…'
+        }))
+      };
+    }
+  }
+
+  // ──────────────────────────────────────────────
+  // 12. FALLBACK — Structured Data Semantic Match
   // ──────────────────────────────────────────────
   const allDocuments = [
     ...projects.map((p) => ({
@@ -587,53 +521,13 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
           snippet: bestMatch.doc.snippet,
           url: bestMatch.doc.url
         }
-      ],
-      suggestedFollowUps: [
-        "Tell me about his AI projects",
-        "What is his experience with Python and LLMs?",
-        "How can I get in touch with Manav?"
       ]
     };
   }
 
-  // ──────────────────────────────────────────────
-  // 12. PDF KNOWLEDGE BASE — BM25 Vector Search
-  // ──────────────────────────────────────────────
-  // If a PDF knowledge index exists, search it as a deep fallback.
-  // This handles precise questions about uploaded documents (resume, research papers, etc.)
-  if (hasKnowledgeIndex()) {
-    const results = searchKnowledgeIndex(rawQuery, 3, 0.5);
-    if (results.length > 0) {
-      const topChunk = results[0].chunk;
-      const combinedText = results
-        .map(r => r.chunk.text)
-        .join('\n\n---\n\n');
-
-      return {
-        answer: `Based on Manav's uploaded documents:\n\n${combinedText}`,
-        sources: results.map(r => ({
-          title: r.chunk.source.replace(/\.pdf$/i, ''),
-          category: `PDF Document (Page ${r.chunk.pageNumber ?? '?'})`,
-          snippet: r.chunk.text.slice(0, 120) + '…',
-        })),
-        suggestedFollowUps: [
-          "Tell me more about his projects",
-          "What are his core technical skills?",
-          "How can I contact him?"
-        ]
-      };
-    }
-  }
-
   // Safe Fallback — Zero Hallucination
   return {
-    answer: "I couldn't find a specific match for that in Manav's verified portfolio data. Try asking about his **projects**, **experience**, **skills**, **education**, or **contact info**.",
-    sources: [],
-    suggestedFollowUps: [
-      "What AI projects has Manav built?",
-      "Tell me about his work at Analytix Solutions",
-      "What are his core skills?",
-      "How can I download his resume?"
-    ]
+    answer: "I couldn't find a specific match for that in Manav's verified portfolio or uploaded documents. Feel free to rephrase or ask about any aspect of his projects, skills, education, or work experience.",
+    sources: []
   };
 }

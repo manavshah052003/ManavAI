@@ -27,14 +27,7 @@ function AskContent() {
     {
       id: 'welcome',
       sender: 'assistant',
-      text: "Hello! I am Manav's local portfolio assistant. I run offline without any external LLM APIs.\n\nAsk me anything about Manav's production AI systems (TaxProGenie, AI-VOX), experience at Analytix Solutions, research publications, or education.",
-      suggestedFollowUps: [
-        'What AI projects has Manav built?',
-        "What is Manav's current role?",
-        'Tell me about TaxProGenie',
-        'What research papers has he published?',
-        'How can I download his resume?'
-      ]
+      text: "Hello! I am Manav's local portfolio assistant. I run offline without any external LLM APIs.\n\nAsk me anything about Manav's background, production AI systems, experience, research publications, or education."
     }
   ]);
 
@@ -175,28 +168,6 @@ function AskContent() {
                         </span>
                       ))}
                     </div>
-                  </div>
-                )}
-
-                {m.suggestedFollowUps && m.suggestedFollowUps.length > 0 && (
-                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px', marginTop: 'var(--space-3)' }}>
-                    {m.suggestedFollowUps.map((chip, cIdx) => (
-                      <button
-                        key={cIdx}
-                        onClick={() => handleSend(chip)}
-                        style={{
-                          fontSize: 'var(--text-xs)',
-                          padding: '3px var(--space-2)',
-                          borderRadius: 'var(--radius-full)',
-                          background: 'var(--color-bg-card)',
-                          border: '1px solid var(--color-border-primary)',
-                          color: 'var(--color-text-secondary)',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        {chip}
-                      </button>
-                    ))}
                   </div>
                 )}
               </div>

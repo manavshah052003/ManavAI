@@ -30,13 +30,7 @@ export function ChatWidget() {
     {
       id: 'welcome',
       sender: 'assistant',
-      text: "Hi! 👋 I'm Manav's portfolio assistant.\n\nAsk me anything about his AI projects, work experience, skills, education, or research — I run 100% locally with zero external APIs.",
-      suggestedFollowUps: [
-        'Tell me about TaxProGenie',
-        "What's his BTech college?",
-        'Show me his skills',
-        'How can I hire him?'
-      ]
+      text: "Hi! 👋 I'm Manav's portfolio assistant.\n\nAsk me anything about his AI projects, work experience, skills, education, or research — I run 100% locally with zero external APIs."
     }
   ]);
 
@@ -182,20 +176,6 @@ export function ChatWidget() {
                             </span>
                           )}
                         </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {m.suggestedFollowUps && m.suggestedFollowUps.length > 0 && (
-                    <div className={styles.suggestionsWrapper}>
-                      {m.suggestedFollowUps.map((chip, idx) => (
-                        <button
-                          key={idx}
-                          className={styles.suggestionChip}
-                          onClick={() => handleSend(chip)}
-                        >
-                          {chip}
-                        </button>
                       ))}
                     </div>
                   )}
