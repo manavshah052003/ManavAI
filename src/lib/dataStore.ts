@@ -58,7 +58,7 @@ export function getInitialStore(): PortfolioStore {
     messages: [],
     settings: {
       siteTitle: 'Manav Shah — AI Engineer & Software Builder',
-      defaultTheme: 'dark',
+      defaultTheme: 'light',
       accentColorLight: '#4F46E5',
       accentColorDark: '#818CF8',
       assistantWelcome: 'Hello! I am Manav\'s local portfolio assistant. Ask me anything about his production AI projects, work at Analytix Solutions, research publications, or education.',

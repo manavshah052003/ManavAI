@@ -67,15 +67,15 @@ export default function RootLayout({
               (function() {
                 try {
                   var theme = localStorage.getItem('manav-portfolio-theme');
-                  var resolved = theme;
-                  if (!theme || theme === 'system') {
+                  var resolved = theme || 'light';
+                  if (theme === 'system') {
                     resolved = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
                   }
                   document.documentElement.setAttribute('data-theme', resolved);
                   document.documentElement.style.colorScheme = resolved;
                 } catch (e) {
-                  document.documentElement.setAttribute('data-theme', 'dark');
-                  document.documentElement.style.colorScheme = 'dark';
+                  document.documentElement.setAttribute('data-theme', 'light');
+                  document.documentElement.style.colorScheme = 'light';
                 }
               })();
             `,

@@ -1,12 +1,4 @@
-import {
-  initialProfile,
-  initialProjects,
-  initialExperience,
-  initialSkills,
-  initialEducation,
-  initialAchievements,
-  initialServices
-} from '@/data/portfolioData';
+import { getStore } from '@/lib/dataStore';
 
 export interface AssistantSource {
   title: string;
@@ -46,14 +38,16 @@ function tokenize(text: string): string[] {
     .filter((t) => t.length > 1 && !STOP_WORDS.has(t));
 }
 
-// Helper: Find education by degree keyword
-function findEduByDegree(keyword: string) {
-  return initialEducation.find(
-    (e) => e.degree.toLowerCase().includes(keyword) || e.field.toLowerCase().includes(keyword)
-  );
-}
-
 export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
+  const store = getStore();
+  const profile = store.profile;
+  const projects = store.projects;
+  const experience = store.experience;
+  const skills = store.skills;
+  const education = store.education;
+  const achievements = store.achievements;
+  const services = store.services;
+
   const query = rawQuery.trim().toLowerCase();
   if (!query) {
     return {
@@ -70,6 +64,13 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
 
   const tokens = tokenize(query);
 
+  // Helper: Find education by degree keyword
+  const findEduByDegree = (keyword: string) => {
+    return education.find(
+      (e) => e.degree.toLowerCase().includes(keyword) || e.field.toLowerCase().includes(keyword)
+    );
+  };
+
   // ──────────────────────────────────────────────
   // 1. CONTACT & SOCIAL
   // ──────────────────────────────────────────────
@@ -83,12 +84,12 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
     query.includes('github')
   ) {
     return {
-      answer: `You can reach Manav directly via:\n\n• **Email**: [${initialProfile.email}](mailto:${initialProfile.email})\n• **Phone**: ${initialProfile.phone}\n• **LinkedIn**: [linkedin.com/in/manavshah-11ai](${initialProfile.linkedin})\n• **GitHub**: [github.com/manavshah052003](${initialProfile.github})\n• **Location**: ${initialProfile.location}\n\nHe is currently ${initialProfile.status.toLowerCase()}.`,
+      answer: `You can reach Manav directly via:\n\n• **Email**: [${profile.email}](mailto:${profile.email})\n• **Phone**: ${profile.phone}\n• **LinkedIn**: [linkedin.com/in/manavshah-11ai](${profile.linkedin})\n• **GitHub**: [github.com/manavshah052003](${profile.github})\n• **Location**: ${profile.location}\n\nHe is currently ${profile.status.toLowerCase()}.`,
       sources: [
         {
           title: 'Profile & Contact Information',
           category: 'Contact',
-          snippet: `${initialProfile.email} | ${initialProfile.location}`
+          snippet: `${profile.email} | ${profile.location}`
         }
       ],
       suggestedFollowUps: [
@@ -104,7 +105,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
   // ──────────────────────────────────────────────
   if (query.includes('resume') || query.includes('cv') || query.includes('download')) {
     return {
-      answer: `You can view and download Manav's resume on the **[Resume page](/resume)**.\n\n**Quick Highlights:**\n• Associate AI Developer at Analytix Solutions\n• M.Tech in AI (PDEU, 9.06 CGPA)\n• B.Tech in CE (Indus University, 9.70 CGPA)\n• 2 IEEE publications in Deep Learning & Biomedical AI`,
+      answer: `You can view and download Manav's resume on the **[Resume page](/resume)**.\n\n**Quick Highlights:**\n• ${experience[0]?.role || 'AI Developer'} at ${experience[0]?.company || 'Analytix Solutions'}\n• M.Tech in AI (PDEU, 9.06 CGPA)\n• B.Tech in CE (Indus University, 9.70 CGPA)\n• 2 IEEE publications in Deep Learning & Biomedical AI`,
       sources: [
         {
           title: 'Manav Shah — Resume',
@@ -129,9 +130,9 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
   const isCollegeQuery = query.includes('college') || query.includes('university') || query.includes('institute') || query.includes('school');
   const isCgpaQuery = query.includes('cgpa') || query.includes('gpa') || query.includes('grades') || query.includes('score') || query.includes('percentage');
 
-  // Specific: "What is his BTech college?" or "Where did he do BTech?"
+  // Specific: "What is his BTech college?"
   if (isBtechQuery && !isMtechQuery) {
-    const btech = findEduByDegree('b.tech') || initialEducation.find(e => e.degree.toLowerCase().includes('bachelor'));
+    const btech = findEduByDegree('b.tech') || education.find(e => e.degree.toLowerCase().includes('bachelor'));
     if (btech) {
       return {
         answer: `Manav completed his **${btech.degree} in ${btech.field}** from **${btech.institution}**, ${btech.location}.\n\n• **Grade**: ${btech.grade}\n• **Duration**: ${btech.startYear}–${btech.endYear}${btech.highlights && btech.highlights.length > 0 ? `\n• **Highlight**: ${btech.highlights[0]}` : ''}`,
@@ -150,9 +151,9 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
     }
   }
 
-  // Specific: "What is his MTech university?" or "Where did he do MTech?"
+  // Specific: "What is his MTech university?"
   if (isMtechQuery && !isBtechQuery) {
-    const mtech = findEduByDegree('m.tech') || initialEducation.find(e => e.degree.toLowerCase().includes('master'));
+    const mtech = findEduByDegree('m.tech') || education.find(e => e.degree.toLowerCase().includes('master'));
     if (mtech) {
       return {
         answer: `Manav completed his **${mtech.degree} in ${mtech.field}** from **${mtech.institution}**, ${mtech.location}.\n\n• **Grade**: ${mtech.grade}\n• **Duration**: ${mtech.startYear}–${mtech.endYear}${mtech.highlights && mtech.highlights.length > 0 ? `\n• **Highlight**: ${mtech.highlights[0]}` : ''}`,
@@ -173,10 +174,10 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
 
   // Specific: CGPA / Grades query
   if (isCgpaQuery && !isCollegeQuery) {
-    const grades = initialEducation.map(e => `• **${e.degree} in ${e.field}** — ${e.institution}: **${e.grade}**`).join('\n');
+    const grades = education.map(e => `• **${e.degree} in ${e.field}** — ${e.institution}: **${e.grade}**`).join('\n');
     return {
       answer: `Here are Manav's academic grades:\n\n${grades}`,
-      sources: initialEducation.map(e => ({
+      sources: education.map(e => ({
         title: `${e.degree} — ${e.institution}`,
         category: 'Education',
         snippet: e.grade,
@@ -190,7 +191,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
     };
   }
 
-  // General education query (college, university, degree, education)
+  // General education query
   if (
     query.includes('education') ||
     query.includes('degree') ||
@@ -198,9 +199,8 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
     query.includes('pdeu') ||
     query.includes('indus')
   ) {
-    // If asking about a specific institution
     if (query.includes('pdeu') || query.includes('pandit') || query.includes('deendayal')) {
-      const pdeu = initialEducation.find(e => e.institution.toLowerCase().includes('pandit'));
+      const pdeu = education.find(e => e.institution.toLowerCase().includes('pandit'));
       if (pdeu) {
         return {
           answer: `At **${pdeu.institution}**, Manav completed his **${pdeu.degree} in ${pdeu.field}** with **${pdeu.grade}** (${pdeu.startYear}–${pdeu.endYear}).${pdeu.highlights && pdeu.highlights.length > 0 ? `\n\n**Highlights**: ${pdeu.highlights.join(', ')}` : ''}`,
@@ -210,7 +210,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
       }
     }
     if (query.includes('indus')) {
-      const indus = initialEducation.find(e => e.institution.toLowerCase().includes('indus'));
+      const indus = education.find(e => e.institution.toLowerCase().includes('indus'));
       if (indus) {
         return {
           answer: `At **${indus.institution}**, Manav completed his **${indus.degree} in ${indus.field}** with **${indus.grade}** (${indus.startYear}–${indus.endYear}).${indus.highlights && indus.highlights.length > 0 ? `\n\n**Highlights**: ${indus.highlights.join(', ')}` : ''}`,
@@ -220,14 +220,13 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
       }
     }
 
-    // General education summary (concise)
-    const eduList = initialEducation
+    const eduList = education
       .map(e => `• **${e.degree} in ${e.field}** — *${e.institution}* (${e.grade}, ${e.startYear}–${e.endYear})`)
       .join('\n');
 
     return {
       answer: `Manav's educational background:\n\n${eduList}`,
-      sources: initialEducation.map(e => ({
+      sources: education.map(e => ({
         title: `${e.degree} — ${e.institution}`,
         category: 'Education',
         snippet: `${e.grade} | ${e.location}`,
@@ -253,7 +252,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
     query.includes('sleep') ||
     query.includes('apnea')
   ) {
-    const research = initialAchievements.filter((a) => a.category === 'Publication');
+    const research = achievements.filter((a) => a.category === 'Publication');
     const list = research
       .map((r) => `• **${r.title}** (${r.date})\n  ${r.description}`)
       .join('\n\n');
@@ -280,9 +279,8 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
   const isCurrentRoleQuery = query.includes('current') || query.includes('now') || query.includes('present') || query.includes('today');
   const isInternQuery = query.includes('intern') || query.includes('internship');
 
-  // Specific: Current role only
   if (isCurrentRoleQuery && (query.includes('role') || query.includes('job') || query.includes('work') || query.includes('position') || query.includes('doing'))) {
-    const currentExp = initialExperience.find(e => e.current);
+    const currentExp = experience.find(e => e.current) || experience[0];
     if (currentExp) {
       return {
         answer: `Manav is currently working as **${currentExp.role}** at **${currentExp.company}**, ${currentExp.location} (since ${currentExp.startDate}).\n\n${currentExp.description}\n\n**Key Responsibilities:**\n${currentExp.responsibilities.slice(0, 4).map(r => `• ${r}`).join('\n')}\n\n**Tech Stack:** ${currentExp.technologies.join(', ')}`,
@@ -301,9 +299,8 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
     }
   }
 
-  // Specific: Internships only
   if (isInternQuery) {
-    const internships = initialExperience.filter(e => e.role.toLowerCase().includes('intern'));
+    const internships = experience.filter(e => e.role.toLowerCase().includes('intern'));
     if (internships.length > 0) {
       const list = internships.map(e =>
         `### ${e.role} at ${e.company}\n*${e.startDate} – ${e.endDate} | ${e.location}*\n\n${e.description}\n\n**Key Work:**\n${e.responsibilities.slice(0, 3).map(r => `• ${r}`).join('\n')}`
@@ -326,7 +323,6 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
     }
   }
 
-  // General experience query
   if (
     query.includes('experience') ||
     query.includes('job') ||
@@ -336,7 +332,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
     query.includes('analytix') ||
     query.includes('schbang')
   ) {
-    const expList = initialExperience
+    const expList = experience
       .map(
         (exp) =>
           `### ${exp.role} at ${exp.company}\n*${exp.startDate} – ${exp.endDate} | ${exp.location}*\n\n${exp.description}\n\n**Key Deliverables:**\n${exp.responsibilities.slice(0, 4).map((r) => `• ${r}`).join('\n')}\n\n**Technologies:** ${exp.technologies.join(', ')}`
@@ -345,7 +341,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
 
     return {
       answer: `Manav's professional experience:\n\n${expList}`,
-      sources: initialExperience.map((exp) => ({
+      sources: experience.map((exp) => ({
         title: `${exp.role} — ${exp.company}`,
         category: 'Experience',
         snippet: `${exp.startDate} – ${exp.endDate} | ${exp.location}`,
@@ -362,7 +358,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
   // ──────────────────────────────────────────────
   // 6. SPECIFIC PROJECT MATCH
   // ──────────────────────────────────────────────
-  const matchedProject = initialProjects.find(
+  const matchedProject = projects.find(
     (p) =>
       query.includes(p.slug) ||
       query.includes(p.title.toLowerCase()) ||
@@ -396,7 +392,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
   // 7. GENERAL PROJECTS QUERY
   // ──────────────────────────────────────────────
   if (query.includes('project') || query.includes('built') || query.includes('portfolio')) {
-    const list = initialProjects
+    const list = projects
       .map(
         (p) =>
           `• **[${p.title}](/projects/${p.slug})** (${p.year} · ${p.category})\n  ${p.shortDescription}`
@@ -405,7 +401,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
 
     return {
       answer: `Manav's key AI & engineering projects:\n\n${list}\n\nExplore detailed case studies on the **[Projects page](/projects)**.`,
-      sources: initialProjects.map((p) => ({
+      sources: projects.map((p) => ({
         title: p.title,
         category: p.category,
         snippet: p.shortDescription,
@@ -435,14 +431,12 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
     query.includes('docker') ||
     query.includes('technolog')
   ) {
-    // Check if asking about a specific technology
     const specificTech = tokens.find(t =>
       ['python', 'pytorch', 'tensorflow', 'langchain', 'fastapi', 'react', 'docker', 'sql', 'azure', 'openai'].includes(t)
     );
 
     if (specificTech) {
-      // Find the skill category containing this technology
-      for (const cat of initialSkills) {
+      for (const cat of skills) {
         const skill = cat.skills.find(s => s.name.toLowerCase().includes(specificTech));
         if (skill) {
           return {
@@ -458,8 +452,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
       }
     }
 
-    // General skills overview
-    const allSkills = initialSkills
+    const allSkills = skills
       .map(
         (cat) =>
           `**${cat.category}:**\n${cat.skills.map((s) => `• ${s.name} (${s.level})`).join('\n')}`
@@ -468,7 +461,7 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
 
     return {
       answer: `Manav's technical proficiency:\n\n${allSkills}`,
-      sources: initialSkills.map((cat) => ({
+      sources: skills.map((cat) => ({
         title: cat.category,
         category: 'Skill Category',
         snippet: cat.skills.map((s) => s.name).join(', '),
@@ -493,12 +486,12 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
     query.includes('summary')
   ) {
     return {
-      answer: `**Manav Shah** — ${initialProfile.role}, based in ${initialProfile.location}.\n\n${initialProfile.shortBio}\n\n**Highlights:**\n• **Current Role**: ${initialExperience[0].role} at ${initialExperience[0].company}\n• **Flagship Project**: TaxProGenie — automated 28+ tax forms for 1.5L taxpayers (98% accuracy)\n• **Education**: M.Tech AI (PDEU, 9.06) & B.Tech CE (Indus, 9.70)\n• **Research**: 2 IEEE publications`,
+      answer: `**Manav Shah** — ${profile.role}, based in ${profile.location}.\n\n${profile.shortBio}\n\n**Highlights:**\n• **Current Role**: ${experience[0]?.role || 'AI Developer'} at ${experience[0]?.company || 'Analytix Solutions'}\n• **Flagship Project**: TaxProGenie — automated 28+ tax forms for 1.5L taxpayers (98% accuracy)\n• **Education**: M.Tech AI (PDEU, 9.06) & B.Tech CE (Indus, 9.70)\n• **Research**: 2 IEEE publications`,
       sources: [
         {
           title: 'About Manav Shah',
           category: 'Profile',
-          snippet: initialProfile.shortBio,
+          snippet: profile.shortBio,
           url: '/about'
         }
       ],
@@ -514,13 +507,13 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
   // 10. SERVICES
   // ──────────────────────────────────────────────
   if (query.includes('service') || query.includes('offer') || query.includes('freelance') || query.includes('consulting')) {
-    const serviceList = initialServices
+    const serviceList = services
       .map(s => `• **${s.title}** — ${s.tagline}`)
       .join('\n');
 
     return {
       answer: `Manav offers the following professional services:\n\n${serviceList}\n\nLearn more on the **[Services page](/services)**.`,
-      sources: initialServices.map(s => ({
+      sources: services.map(s => ({
         title: s.title,
         category: 'Service',
         snippet: s.tagline,
@@ -538,28 +531,28 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
   // 11. FALLBACK — Semantic Token Overlap
   // ──────────────────────────────────────────────
   const allDocuments = [
-    ...initialProjects.map((p) => ({
+    ...projects.map((p) => ({
       title: p.title,
       category: 'Project',
       text: `${p.title} ${p.shortDescription} ${p.fullDescription} ${p.problem} ${p.solution} ${p.technologies.join(' ')}`,
       url: `/projects/${p.slug}`,
       snippet: p.shortDescription
     })),
-    ...initialExperience.map((e) => ({
+    ...experience.map((e) => ({
       title: `${e.role} at ${e.company}`,
       category: 'Experience',
       text: `${e.company} ${e.role} ${e.description} ${e.responsibilities.join(' ')} ${e.technologies.join(' ')}`,
       url: '/experience',
       snippet: e.description
     })),
-    ...initialSkills.map((s) => ({
+    ...skills.map((s) => ({
       title: s.category,
       category: 'Skills',
       text: `${s.category} ${s.skills.map((k) => k.name).join(' ')}`,
       url: '/skills',
       snippet: s.skills.map((k) => k.name).join(', ')
     })),
-    ...initialEducation.map((ed) => ({
+    ...education.map((ed) => ({
       title: `${ed.degree} in ${ed.field}`,
       category: 'Education',
       text: `${ed.institution} ${ed.degree} ${ed.field} ${ed.description} ${ed.subjects?.join(' ')}`,

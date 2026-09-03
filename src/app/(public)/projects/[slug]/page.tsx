@@ -228,7 +228,7 @@ export default async function ProjectDetailPage({
                     fontWeight: 500
                   }}
                 >
-                  &check; {res}
+                  ✓ {res}
                 </div>
               ))}
             </div>
