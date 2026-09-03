@@ -2,10 +2,11 @@
  * Vector Search — BM25+ Retrieval over Knowledge Index
  *
  * Enhanced BM25 with:
- * 1. Smoothed IDF baseline (+0.5) so small document collections don't zero out
- * 2. Exact phrase boost for multi-word matches (e.g. "Daniel Steele", "Feed Us Up", "TaxProGenie")
- * 3. Substring matching for token variations
- * 4. Document-length normalization
+ * 1. Semantic query expansion for universal CV & portfolio queries (contact, phone, email, projects, skills, education)
+ * 2. Smoothed IDF baseline (+0.5) so small document collections don't zero out
+ * 3. Exact phrase boost for multi-word matches (e.g. "Daniel Steele", "Feed Us Up", "AudioStats")
+ * 4. Intent-specific pattern detection (emails with '@', phone numbers, links)
+ * 5. Document-length normalization
  */
 
 import { loadIndex, indexTokenize, KnowledgeChunk } from './indexBuilder';
@@ -17,6 +18,51 @@ export interface SearchResult {
   chunk: KnowledgeChunk;
   score: number;
   rank: number;
+}
+
+/**
+ * Expand query tokens with synonyms for universal document matching.
+ */
+function expandQueryTokens(query: string, rawTokens: string[]): string[] {
+  const q = query.toLowerCase();
+  const expanded = new Set(rawTokens);
+
+  if (q.includes('email') || q.includes('mail') || q.includes('contact') || q.includes('reach') || q.includes('hire')) {
+    expanded.add('email');
+    expanded.add('gmail');
+    expanded.add('contact');
+  }
+  if (q.includes('phone') || q.includes('call') || q.includes('number') || q.includes('mobile') || q.includes('cell')) {
+    expanded.add('mobile');
+    expanded.add('phone');
+    expanded.add('tel');
+  }
+  if (q.includes('social') || q.includes('linkedin') || q.includes('github') || q.includes('portfolio') || q.includes('website')) {
+    expanded.add('linkedin');
+    expanded.add('github');
+  }
+  if (q.includes('college') || q.includes('university') || q.includes('degree') || q.includes('education') || q.includes('study') || q.includes('school')) {
+    expanded.add('education');
+    expanded.add('university');
+    expanded.add('bachelor');
+    expanded.add('master');
+    expanded.add('science');
+  }
+  if (q.includes('project') || q.includes('built') || q.includes('app') || q.includes('application')) {
+    expanded.add('projects');
+    expanded.add('personal');
+  }
+  if (q.includes('skill') || q.includes('technolog') || q.includes('stack') || q.includes('tool') || q.includes('framework')) {
+    expanded.add('skills');
+    expanded.add('technical');
+    expanded.add('stack');
+  }
+  if (q.includes('work') || q.includes('job') || q.includes('experience') || q.includes('career') || q.includes('role')) {
+    expanded.add('experience');
+    expanded.add('developer');
+  }
+
+  return Array.from(expanded);
 }
 
 /**
@@ -33,14 +79,28 @@ function scoreChunk(
   let score = 0;
   const docLen = chunk.words.length || 1;
   const chunkTextLower = chunk.text.toLowerCase();
+  const cleanQuery = rawQuery.trim().toLowerCase();
 
   // 1. Exact phrase boost (huge relevance signal if multi-word query appears verbatim)
-  const cleanQuery = rawQuery.trim().toLowerCase();
   if (queryTokens.length >= 2 && chunkTextLower.includes(cleanQuery)) {
     score += 8.0;
   }
 
-  // 2. Token scoring with smoothed BM25-IDF
+  // 2. Intent-specific pattern boosts
+  if ((cleanQuery.includes('email') || cleanQuery.includes('mail') || cleanQuery.includes('contact')) && (chunkTextLower.includes('@') || chunkTextLower.includes('gmail'))) {
+    score += 6.0;
+  }
+  if ((cleanQuery.includes('phone') || cleanQuery.includes('mobile') || cleanQuery.includes('number') || cleanQuery.includes('contact')) && (chunkTextLower.includes('mobile') || chunkTextLower.includes('07') || chunkTextLower.includes('+'))) {
+    score += 6.0;
+  }
+  if ((cleanQuery.includes('college') || cleanQuery.includes('university') || cleanQuery.includes('education') || cleanQuery.includes('degree')) && (chunkTextLower.includes('university') || chunkTextLower.includes('bachelor') || chunkTextLower.includes('education'))) {
+    score += 5.0;
+  }
+  if ((cleanQuery.includes('skill') || cleanQuery.includes('technolog') || cleanQuery.includes('stack')) && (chunkTextLower.includes('technical skills') || chunkTextLower.includes('core stack') || chunkTextLower.includes('frameworks'))) {
+    score += 5.0;
+  }
+
+  // 3. Token scoring with smoothed BM25-IDF
   for (const term of queryTokens) {
     const rawTf = chunk.tf[term] ? chunk.tf[term] * docLen : 0;
     const inText = chunkTextLower.includes(term);
@@ -79,7 +139,8 @@ export function searchKnowledgeIndex(
   const index = loadIndex();
   if (!index || !index.chunks || index.chunks.length === 0) return [];
 
-  const queryTokens = indexTokenize(query);
+  const baseTokens = indexTokenize(query);
+  const queryTokens = expandQueryTokens(query, baseTokens);
   if (queryTokens.length === 0) return [];
 
   // Compute average document length
@@ -109,7 +170,7 @@ export function getIndexStats() {
     totalSources: index.sources ? index.sources.length : 0,
     lastUpdated: index.lastUpdated,
     sources: index.sources || [],
-    hasData: (index.chunks && index.chunks.length > 0),
+    hasData: Boolean(index && index.chunks && index.chunks.length > 0),
   };
 }
 
