@@ -1,4 +1,5 @@
 import { getStore } from '@/lib/dataStore';
+import { searchKnowledgeIndex, hasKnowledgeIndex } from './vectorSearch';
 
 export interface AssistantSource {
   title: string;
@@ -593,6 +594,35 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
         "How can I get in touch with Manav?"
       ]
     };
+  }
+
+  // ──────────────────────────────────────────────
+  // 12. PDF KNOWLEDGE BASE — BM25 Vector Search
+  // ──────────────────────────────────────────────
+  // If a PDF knowledge index exists, search it as a deep fallback.
+  // This handles precise questions about uploaded documents (resume, research papers, etc.)
+  if (hasKnowledgeIndex()) {
+    const results = searchKnowledgeIndex(rawQuery, 3, 0.5);
+    if (results.length > 0) {
+      const topChunk = results[0].chunk;
+      const combinedText = results
+        .map(r => r.chunk.text)
+        .join('\n\n---\n\n');
+
+      return {
+        answer: `Based on Manav's uploaded documents:\n\n${combinedText}`,
+        sources: results.map(r => ({
+          title: r.chunk.source.replace(/\.pdf$/i, ''),
+          category: `PDF Document (Page ${r.chunk.pageNumber ?? '?'})`,
+          snippet: r.chunk.text.slice(0, 120) + '…',
+        })),
+        suggestedFollowUps: [
+          "Tell me more about his projects",
+          "What are his core technical skills?",
+          "How can I contact him?"
+        ]
+      };
+    }
   }
 
   // Safe Fallback — Zero Hallucination
