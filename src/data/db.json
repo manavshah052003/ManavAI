@@ -864,6 +864,16 @@
   ],
   "messages": [
     {
+      "name": "Test Recruiter",
+      "email": "recruiter@tech.com",
+      "company": "AI Labs",
+      "subject": "Senior AI Role",
+      "message": "Hi Manav, loved your TaxProGenie project!",
+      "id": "msg-1788412633895",
+      "createdAt": "2026-09-03T05:17:13.895Z",
+      "status": "unread"
+    },
+    {
       "name": "Recruiter Lead",
       "email": "recruiter@topcompany.com",
       "company": "AI Frontier Labs",
