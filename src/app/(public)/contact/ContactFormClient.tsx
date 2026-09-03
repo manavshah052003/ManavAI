@@ -63,7 +63,7 @@ export function ContactFormClient() {
               fontWeight: 700
             }}
           >
-            &check;
+            ✓
           </div>
           <h3 style={{ fontSize: 'var(--text-xl)', fontWeight: 700, color: 'var(--color-text-primary)' }}>
             Message Delivered

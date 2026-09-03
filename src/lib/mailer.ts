@@ -18,7 +18,8 @@ export interface SendEmailResult {
  */
 export async function sendContactEmail(payload: ContactEmailPayload): Promise<SendEmailResult> {
   const { name, email, company, subject, message } = payload;
-  const recipientEmail = process.env.CONTACT_RECEIVER_EMAIL || 'Manavshah052003@gmail.com';
+  const rawRecipient = process.env.CONTACT_RECEIVER_EMAIL || 'manavshah052003@gmail.com';
+  const recipientEmail = rawRecipient.toLowerCase().trim();
   const emailSubject = subject?.trim() ? `[Portfolio Inquiry] ${subject} - from ${name}` : `[Portfolio Inquiry] New message from ${name}`;
 
   // 1. Check for Resend API Key (Recommended free tier: 3,000 emails/mo)
@@ -83,11 +84,11 @@ export async function sendContactEmail(payload: ContactEmailPayload): Promise<Se
       const res = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${resendApiKey}`,
+          'Authorization': `Bearer ${resendApiKey.trim()}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          from: process.env.RESEND_FROM_EMAIL || 'Manav Portfolio <onboarding@resend.dev>',
+          from: process.env.RESEND_FROM_EMAIL || 'onboarding@resend.dev',
           to: [recipientEmail],
           reply_to: email,
           subject: emailSubject,
