@@ -67,7 +67,31 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
   };
 
   // ──────────────────────────────────────────────
-  // 1. CONTACT & SOCIAL
+  // 1. PRIMARY SOURCE: PDF KNOWLEDGE BASE (BM25+ Vector Search)
+  // ──────────────────────────────────────────────
+  // If the user uploaded PDF documents to the knowledge index, search them FIRST.
+  // Any questions that have answers in the uploaded documents will be grounded directly from the PDF.
+  if (hasKnowledgeIndex()) {
+    const results = searchKnowledgeIndex(rawQuery, 3, 0.2);
+    if (results.length > 0) {
+      const topChunk = results[0].chunk;
+      const combinedText = results
+        .map(r => r.chunk.text)
+        .join('\n\n---\n\n');
+
+      return {
+        answer: `Based on **${topChunk.source}** (Page ${topChunk.pageNumber ?? 1}):\n\n${combinedText}`,
+        sources: results.map(r => ({
+          title: r.chunk.source.replace(/\.pdf$/i, ''),
+          category: `Document (Page ${r.chunk.pageNumber ?? 1})`,
+          snippet: r.chunk.text.slice(0, 160) + '…'
+        }))
+      };
+    }
+  }
+
+  // ──────────────────────────────────────────────
+  // 2. CONTACT & SOCIAL
   // ──────────────────────────────────────────────
   if (
     query.includes('contact') ||
@@ -440,27 +464,6 @@ export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
     };
   }
 
-  // ──────────────────────────────────────────────
-  // 11. PDF KNOWLEDGE BASE — BM25 Vector Search
-  // ──────────────────────────────────────────────
-  // High priority search across any uploaded documents (Resume, Project deep-dives, IEEE papers, Certs, etc.)
-  if (hasKnowledgeIndex()) {
-    const results = searchKnowledgeIndex(rawQuery, 3, 0.4);
-    if (results.length > 0) {
-      const combinedText = results
-        .map(r => r.chunk.text)
-        .join('\n\n---\n\n');
-
-      return {
-        answer: `Based on Manav's verified documents:\n\n${combinedText}`,
-        sources: results.map(r => ({
-          title: r.chunk.source.replace(/\.pdf$/i, ''),
-          category: `Document (Page ${r.chunk.pageNumber ?? '?'})`,
-          snippet: r.chunk.text.slice(0, 140) + '…'
-        }))
-      };
-    }
-  }
 
   // ──────────────────────────────────────────────
   // 12. FALLBACK — Structured Data Semantic Match
