@@ -9,6 +9,9 @@ export const metadata = {
   description: 'Academic background, degrees, research specialization, and coursework of Manav Shah.'
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function EducationPage() {
   const educations = await getEducations();
 

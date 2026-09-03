@@ -9,6 +9,9 @@ export const metadata = {
   description: 'What Manav Shah builds: Production AI Systems, Enterprise Workflow Automation, and Full-Stack Engineering.'
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function ServicesPage() {
   const services = await getServices();
 

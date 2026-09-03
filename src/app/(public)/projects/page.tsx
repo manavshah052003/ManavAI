@@ -8,6 +8,9 @@ export const metadata = {
   description: 'Selected engineering projects, AI pipelines, LLM architectures, and experiments built by Manav Shah.'
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function ProjectsPage() {
   const projects = await getProjects();
 

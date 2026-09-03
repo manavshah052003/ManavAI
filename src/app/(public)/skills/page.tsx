@@ -10,6 +10,7 @@ export const metadata = {
   description: 'Technical competencies, proficiency tiers, frameworks, and engineering tools used by Manav Shah.'
 };
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 0; // Live data updates from Admin CRUD
 
 export default async function SkillsPage() {

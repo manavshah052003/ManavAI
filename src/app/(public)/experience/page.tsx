@@ -11,6 +11,9 @@ export const metadata = {
   description: 'Professional experience, roles, responsibilities, and key impact of Manav Shah.'
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function ExperiencePage() {
   const experiences = await getExperiences();
   const projects = await getProjects();

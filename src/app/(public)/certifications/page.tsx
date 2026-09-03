@@ -10,6 +10,9 @@ export const metadata = {
   description: 'Verified professional certifications and technical specializations completed by Manav Shah.'
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function CertificationsPage() {
   const certs = await getCertifications();
 

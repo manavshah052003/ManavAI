@@ -11,6 +11,9 @@ export const metadata = {
   description: 'Learn about Manav Shah — AI Engineer, background, philosophy, metrics, and technical journey.'
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function AboutPage() {
   const profile = await getProfile();
 

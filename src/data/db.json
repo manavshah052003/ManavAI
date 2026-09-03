@@ -476,6 +476,11 @@
           "name": "OpenAI, Anthropic & Gemini APIs",
           "level": "Primary",
           "years": "2+"
+        },
+        {
+          "name": "langchain",
+          "level": "Primary",
+          "years": "2+"
         }
       ]
     },

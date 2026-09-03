@@ -9,6 +9,9 @@ export const metadata = {
   description: 'IEEE research publications, academic milestones, and leadership honors by Manav Shah.'
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function AchievementsPage() {
   const achievements = await getAchievements();
 

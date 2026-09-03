@@ -70,20 +70,21 @@ export function getInitialStore(): PortfolioStore {
   };
 }
 
-// Ensure db.json exists, if not initialize it
+// Ensure db.json exists and ALWAYS read fresh data from disk when available
 export function getStore(): PortfolioStore {
-  if (memoryStore) {
-    return memoryStore;
-  }
-
   try {
     if (fs.existsSync(DATA_FILE_PATH)) {
       const data = fs.readFileSync(DATA_FILE_PATH, 'utf-8');
-      memoryStore = JSON.parse(data);
-      return memoryStore!;
+      const parsed = JSON.parse(data);
+      memoryStore = parsed;
+      return parsed;
     }
   } catch (error) {
-    console.warn('Could not read db.json file, falling back to initial data:', error);
+    console.warn('Could not read db.json file from disk:', error);
+  }
+
+  if (memoryStore) {
+    return memoryStore;
   }
 
   const initialStore = getInitialStore();

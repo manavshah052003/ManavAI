@@ -10,6 +10,9 @@ export const metadata = {
   description: 'Technical writeups on AI engineering, deterministic LLM pipelines, and biomedical deep learning.'
 };
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export default async function NotesPage() {
   const notes = await getNotes();
 
