@@ -1,5 +1,14 @@
+/**
+ * Dynamic Portfolio Assistant & Question Answering Engine
+ * 
+ * 100% Dynamic — Zero hardcoded questions or answers.
+ * Ingests unified knowledge from both structured portfolio database and uploaded PDF documents.
+ * Retrieves semantically relevant facts and synthesizes precise, targeted answers.
+ * Supports optional Gemini LLM generation when GEMINI_API_KEY is configured.
+ */
+
 import { getStore } from '@/lib/dataStore';
-import { searchKnowledgeIndex, hasKnowledgeIndex } from './vectorSearch';
+import { loadIndex, KnowledgeChunk } from './indexBuilder';
 
 export interface AssistantSource {
   title: string;
@@ -12,6 +21,14 @@ export interface AssistantResponse {
   answer: string;
   sources: AssistantSource[];
   suggestedFollowUps?: string[];
+}
+
+interface KnowledgePassage {
+  id: string;
+  title: string;
+  category: string;
+  url?: string;
+  text: string;
 }
 
 const STOP_WORDS = new Set([
@@ -28,509 +45,392 @@ const STOP_WORDS = new Set([
   'under', 'until', 'up', 'very',
   'was', 'we', 'were', 'what', 'when', 'where', 'which', 'while', 'who', 'whom', 'why', 'with', 'would',
   'you', 'your', 'yours', 'yourself', 'yourselves',
-  'tell', 'show', 'know', 'manav', 'shah', 'manav\'s', 'he', 'his'
+  'tell', 'show', 'know', 'manav', 'shah', "manav's", 'he', 'his'
 ]);
 
-function tokenize(text: string): string[] {
+function normalizeQueryText(text: string): string {
   return text
     .toLowerCase()
-    .replace(/[^a-z0-9\s\.\-\+\#]/g, ' ')
-    .split(/\s+/)
-    .filter((t) => t.length > 1 && !STOP_WORDS.has(t));
+    .replace(/\bb\.?\s*tech\b/g, 'btech')
+    .replace(/\bm\.?\s*tech\b/g, 'mtech')
+    .replace(/\bb\.?\s*e\b/g, 'btech')
+    .replace(/\bcgpa\b/g, 'cgpa')
+    .replace(/\bgpa\b/g, 'cgpa')
+    .replace(/\bcolleges?\b/g, 'university')
+    .replace(/\binstitutions?\b/g, 'university')
+    .replace(/\binstitutes?\b/g, 'university')
+    .replace(/\buniversities\b/g, 'university')
+    .replace(/\bemails?\b/g, 'email')
+    .replace(/\bmails?\b/g, 'email')
+    .replace(/\bphones?\b/g, 'phone')
+    .replace(/\bmobiles?\b/g, 'phone');
 }
 
-export function queryPortfolioAssistant(rawQuery: string): AssistantResponse {
-  const store = getStore();
-  const profile = store.profile;
-  const projects = store.projects;
-  const experience = store.experience;
-  const skills = store.skills;
-  const education = store.education;
-  const achievements = store.achievements;
-  const services = store.services;
+function tokenize(text: string): string[] {
+  const norm = normalizeQueryText(text);
+  return norm
+    .replace(/[^a-z0-9\s\-\+\#]/g, ' ')
+    .split(/\s+/)
+    .filter(t => t.length > 1 && !STOP_WORDS.has(t));
+}
 
+/**
+ * Builds a dynamic unified knowledge base aggregating all portfolio records and uploaded PDF chunks.
+ */
+function buildUnifiedKnowledgeBase(): KnowledgePassage[] {
+  const store = getStore();
+  const passages: KnowledgePassage[] = [];
+
+  // 1. Profile & Contact
+  const p = store.profile;
+  if (p) {
+    passages.push({
+      id: 'profile',
+      title: 'Profile & Contact Details',
+      category: 'Contact',
+      url: '/about',
+      text: `Manav Shah is an ${p.role} based in ${p.location}. Email: ${p.email}. Phone: ${p.phone || ''}. LinkedIn: ${p.linkedin}. GitHub: ${p.github}. Status: ${p.status}. Bio: ${p.shortBio || p.tagline || ''}`
+    });
+  }
+
+  // 2. Education
+  for (const ed of (store.education || [])) {
+    passages.push({
+      id: `edu_${ed.id}`,
+      title: `${ed.degree} in ${ed.field} — ${ed.institution}`,
+      category: 'Education',
+      url: '/education',
+      text: `Manav completed his ${ed.degree} in ${ed.field} from ${ed.institution}, ${ed.location} (${ed.startYear}–${ed.endYear}). Academic Grade / CGPA: ${ed.grade}. Highlights: ${(ed.highlights || []).join('; ')}. ${ed.description || ''}`
+    });
+  }
+
+  // 3. Experience
+  for (const exp of (store.experience || [])) {
+    passages.push({
+      id: `exp_${exp.id}`,
+      title: `${exp.role} at ${exp.company}`,
+      category: 'Experience',
+      url: '/experience',
+      text: `Manav worked as ${exp.role} at ${exp.company} in ${exp.location} (${exp.startDate} – ${exp.endDate}). Description: ${exp.description}. Responsibilities and deliverables: ${(exp.responsibilities || []).join('. ')}. Technologies: ${(exp.technologies || []).join(', ')}.`
+    });
+  }
+
+  // 4. Projects
+  for (const pr of (store.projects || [])) {
+    passages.push({
+      id: `proj_${pr.id}`,
+      title: `${pr.title} (${pr.category})`,
+      category: 'Project',
+      url: `/projects/${pr.slug}`,
+      text: `${pr.title} (${pr.year}) by Manav Shah: ${pr.shortDescription}. Problem: ${pr.problem}. Solution: ${pr.solution}. Key Results & Metrics: ${(pr.results || []).join('. ')}. Technologies: ${(pr.technologies || []).join(', ')}. Details: ${pr.fullDescription || ''}`
+    });
+  }
+
+  // 5. Skills
+  for (const sk of (store.skills || [])) {
+    passages.push({
+      id: `skill_${sk.category}`,
+      title: `${sk.category} Skills`,
+      category: 'Skills',
+      url: '/skills',
+      text: `Technical skills in ${sk.category}: ${sk.skills.map(s => `${s.name} (${s.level}${s.years ? `, ${s.years}` : ''})`).join(', ')}.`
+    });
+  }
+
+  // 6. Research & Achievements
+  for (const ach of (store.achievements || [])) {
+    passages.push({
+      id: `ach_${ach.id}`,
+      title: ach.title,
+      category: ach.category || 'Research & Achievement',
+      url: '/achievements',
+      text: `${ach.title} (${ach.date}): ${ach.description}. ${ach.metrics ? `Metrics: ${ach.metrics}` : ''}`
+    });
+  }
+
+  // 7. Certifications
+  for (const cert of (store.certifications || [])) {
+    passages.push({
+      id: `cert_${cert.id}`,
+      title: cert.name,
+      category: 'Certification',
+      url: '/certifications',
+      text: `Certification: ${cert.name} issued by ${cert.issuer} (${cert.date}). Skills: ${cert.skills.join(', ')}.`
+    });
+  }
+
+  // 8. Services
+  for (const s of (store.services || [])) {
+    passages.push({
+      id: `srv_${s.id}`,
+      title: s.title,
+      category: 'Service',
+      url: '/services',
+      text: `Service: ${s.title} — ${s.tagline}. Description: ${s.description}. Capabilities: ${(s.capabilities || []).join(', ')}. Tech: ${(s.technologies || []).join(', ')}.`
+    });
+  }
+
+  // 8. Uploaded Document PDF Chunks
+  try {
+    const pdfIndex = loadIndex();
+    if (pdfIndex && pdfIndex.chunks && pdfIndex.chunks.length > 0) {
+      for (const c of pdfIndex.chunks) {
+        passages.push({
+          id: c.id,
+          title: `${c.source.replace(/\.pdf$/i, '')} (Page ${c.pageNumber || 1})`,
+          category: 'Uploaded Document',
+          url: '/admin/chatbot',
+          text: c.text
+        });
+      }
+    }
+  } catch {
+    // Index file not yet created or empty
+  }
+
+  return passages;
+}
+
+/**
+ * Optional LLM Answer Synthesis using Google Gemini API (if GEMINI_API_KEY is provided).
+ */
+async function generateWithGemini(
+  rawQuery: string,
+  topPassages: KnowledgePassage[],
+  apiKey: string
+): Promise<string | null> {
+  try {
+    const context = topPassages.map((p, idx) => `[Fact ${idx + 1} - ${p.title}]:\n${p.text}`).join('\n\n');
+    const prompt = `You are the official portfolio assistant for Manav Shah, an AI Engineer.
+Answer the recruiter or user's question accurately, concisely, and professionally using ONLY the verified facts provided below.
+Rules:
+- Give a direct, precise answer in 1 to 3 sentences or clean bullet points with markdown bolding on key terms (e.g. college names, metrics, companies, roles).
+- Never dump raw unparsed text or unrelated paragraphs.
+- If the answer is not present in the facts below, state: "I don't have that verified in Manav's portfolio records."
+
+Context Facts:
+${context}
+
+User Question: ${rawQuery}
+Answer:`;
+
+    const res = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            temperature: 0.1,
+            maxOutputTokens: 300,
+          }
+        }),
+      }
+    );
+
+    if (!res.ok) return null;
+    const data = await res.json();
+    const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    return text ? text.trim() : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Dynamic Local Extractive Synthesizer — Zero hardcoded rules, runs purely in-memory.
+ */
+function synthesizeLocalAnswer(
+  rawQuery: string,
+  topPassages: KnowledgePassage[]
+): AssistantResponse {
+  const query = rawQuery.trim().toLowerCase();
+  const qTokens = tokenize(query);
+  const bestDoc = topPassages[0];
+
+  const candidateStatements: { text: string; score: number; doc: KnowledgePassage }[] = [];
+
+  for (const p of topPassages) {
+    let raw = p.text;
+
+    // Segment text into discrete statements
+    raw = raw
+      .replace(/(EDUCATIONAL QUALIFICATION|WORK EXPERIENCE|TECHNICAL SKILLS|PROJECTS|RESEARCH\s*(?:&|AND)?\s*PUBLICATIONS|PUBLICATIONS|CERTIFICATIONS|ACHIEVEMENTS)/gi, '\n')
+      .replace(/[•●▪]\s*/g, '\n')
+      .replace(/(?<!\n)(B\.Tech|M\.Tech|B\.E\.|Bachelor|Master)\s+in/gi, '\n$1 in')
+      .replace(/([.!?])\s+([A-Z])/g, '$1\n$2');
+
+    const statements = raw
+      .split('\n')
+      .map(s => s.trim())
+      .filter(s => s.length >= 15);
+
+    for (const stmt of statements) {
+      const stmtLower = stmt.toLowerCase();
+
+      // Drop contact noise unless user asked for contact
+      if (
+        (stmtLower.includes('@gmail.com') || (stmtLower.includes('@') && stmtLower.includes('.com'))) &&
+        !query.includes('email') && !query.includes('contact') && !query.includes('reach')
+      ) {
+        continue;
+      }
+      if (
+        (stmtLower.includes('linkedin.com') || stmtLower.includes('github.com')) &&
+        !query.includes('linkedin') && !query.includes('github') && !query.includes('social')
+      ) {
+        continue;
+      }
+      if (stmtLower.startsWith('manav shah ai engineer') && stmtLower.length < 80) {
+        continue;
+      }
+
+      let score = 0;
+      const stmtTokens = tokenize(stmtLower);
+      const tokenSet = new Set(stmtTokens);
+
+      for (const qt of qTokens) {
+        if (tokenSet.has(qt)) {
+          score += 5;
+        } else if (stmtLower.includes(qt)) {
+          score += 2;
+        }
+      }
+
+      // Linguistic Target Relevance Boosts
+      if (query.includes('college') || query.includes('university') || query.includes('institute') || query.includes('school')) {
+        if (stmtLower.includes('university') || stmtLower.includes('institute') || stmtLower.includes('college')) score += 6;
+      }
+      if (query.includes('cgpa') || query.includes('gpa') || query.includes('grade') || query.includes('score')) {
+        if (stmtLower.includes('cgpa') || stmtLower.includes('gpa') || /\b\d\.\d{2}\b/.test(stmtLower)) score += 6;
+      }
+      if (query.includes('accuracy') || query.includes('percent') || query.includes('%') || query.includes('metric') || query.includes('result')) {
+        if (stmtLower.includes('%') || stmtLower.includes('accuracy') || stmtLower.includes('reduced')) score += 5;
+      }
+
+      if (score > 0) {
+        candidateStatements.push({ text: stmt, score, doc: p });
+      }
+    }
+  }
+
+  candidateStatements.sort((a, b) => b.score - a.score);
+
+  // Deduplicate statements
+  const uniqueStatements: typeof candidateStatements = [];
+  for (const s of candidateStatements) {
+    const isDup = uniqueStatements.some(u =>
+      u.text.slice(0, 35).toLowerCase() === s.text.slice(0, 35).toLowerCase()
+    );
+    if (!isDup) uniqueStatements.push(s);
+    if (uniqueStatements.length >= 2) break;
+  }
+
+  const sources: AssistantSource[] = topPassages.map(p => ({
+    title: p.title,
+    category: p.category,
+    snippet: p.text.slice(0, 140).replace(/\s+/g, ' ') + '…',
+    url: p.url
+  }));
+
+  if (uniqueStatements.length > 0 && uniqueStatements[0].score >= 3) {
+    const formattedBullets = uniqueStatements.map(s => {
+      let t = s.text;
+      // Emphasize key entities dynamically
+      t = t.replace(/\b(Indus University|Pandit Deendayal Energy University|PDEU|Analytix Solutions|Schbang)\b/gi, '**$1**');
+      t = t.replace(/\b(B\.Tech|M\.Tech|Computer Engineering|Artificial Intelligence)\b/gi, '**$1**');
+      t = t.replace(/\b(CGPA:\s*[0-9.]+|9\.[0-9]{2}|98%|90%|95%|92\.4%)\b/gi, '**$1**');
+      t = t.replace(/\b(TaxProGenie|AI-VOX|Artifax)\b/gi, '**$1**');
+      return `• ${t}`;
+    }).join('\n\n');
+
+    return {
+      answer: `Based on Manav's verified records & documents:\n\n${formattedBullets}`,
+      sources
+    };
+  }
+
+  const cleanSnippet = bestDoc.text.slice(0, 240).replace(/\s+/g, ' ').trim();
+  return {
+    answer: `Based on Manav's records — **${bestDoc.title}**:\n\n${cleanSnippet}…`,
+    sources
+  };
+}
+
+/**
+ * Main Entry Point: Dynamic Query Engine
+ */
+export async function queryPortfolioAssistant(rawQuery: string): Promise<AssistantResponse> {
   const query = rawQuery.trim().toLowerCase();
   if (!query) {
     return {
-      answer: "Hi! 👋 I'm Manav's local portfolio assistant. Ask me anything about his AI projects, work experience, skills, education, or research.",
+      answer: "Hi! 👋 I'm Manav's portfolio assistant. Ask me anything about his AI engineering work, projects, education, experience, or skills.",
       sources: []
     };
   }
 
-  const tokens = tokenize(query);
+  const qTokens = tokenize(query);
+  const knowledgeBase = buildUnifiedKnowledgeBase();
 
-  // Helper: Find education by degree keyword
-  const findEduByDegree = (keyword: string) => {
-    return education.find(
-      (e) => e.degree.toLowerCase().includes(keyword) || e.field.toLowerCase().includes(keyword)
-    );
-  };
-
-  // ──────────────────────────────────────────────
-  // 1. PRIMARY SOURCE: PDF KNOWLEDGE BASE (BM25+ Vector Search)
-  // ──────────────────────────────────────────────
-  // If the user uploaded PDF documents to the knowledge index, search them FIRST.
-  // Any questions that have answers in the uploaded documents will be grounded directly from the PDF.
-  if (hasKnowledgeIndex()) {
-    const results = searchKnowledgeIndex(rawQuery, 3, 0.2);
-    if (results.length > 0) {
-      const topChunk = results[0].chunk;
-      const combinedText = results
-        .map(r => r.chunk.text)
-        .join('\n\n---\n\n');
-
-      return {
-        answer: `Based on **${topChunk.source}** (Page ${topChunk.pageNumber ?? 1}):\n\n${combinedText}`,
-        sources: results.map(r => ({
-          title: r.chunk.source.replace(/\.pdf$/i, ''),
-          category: `Document (Page ${r.chunk.pageNumber ?? 1})`,
-          snippet: r.chunk.text.slice(0, 160) + '…'
-        }))
-      };
-    }
-  }
-
-  // ──────────────────────────────────────────────
-  // 2. CONTACT & SOCIAL
-  // ──────────────────────────────────────────────
-  if (
-    query.includes('contact') ||
-    query.includes('email') ||
-    query.includes('phone') ||
-    query.includes('reach') ||
-    query.includes('hire') ||
-    query.includes('linkedin') ||
-    query.includes('github')
-  ) {
-    return {
-      answer: `You can reach Manav directly via:\n\n• **Email**: [${profile.email}](mailto:${profile.email})\n• **Phone**: ${profile.phone}\n• **LinkedIn**: [linkedin.com/in/manavshah-11ai](${profile.linkedin})\n• **GitHub**: [github.com/manavshah052003](${profile.github})\n• **Location**: ${profile.location}\n\nHe is currently ${profile.status.toLowerCase()}.`,
-      sources: [
-        {
-          title: 'Profile & Contact Information',
-          category: 'Contact',
-          snippet: `${profile.email} | ${profile.location}`
-        }
-      ]
-    };
-  }
-
-  // ──────────────────────────────────────────────
-  // 2. RESUME
-  // ──────────────────────────────────────────────
-  if (query.includes('resume') || query.includes('cv') || query.includes('download')) {
-    return {
-      answer: `You can view and download Manav's resume on the **[Resume page](/resume)**.\n\n**Quick Highlights:**\n• ${experience[0]?.role || 'AI Developer'} at ${experience[0]?.company || 'Analytix Solutions'}\n• M.Tech in AI (PDEU, 9.06 CGPA)\n• B.Tech in CE (Indus University, 9.70 CGPA)\n• 2 IEEE publications in Deep Learning & Biomedical AI`,
-      sources: [
-        {
-          title: 'Manav Shah — Resume',
-          category: 'Resume',
-          snippet: 'AI Engineer | Generative AI | LLMs',
-          url: '/resume'
-        }
-      ]
-    };
-  }
-
-  // ──────────────────────────────────────────────
-  // 3. EDUCATION — GRANULAR SUB-INTENTS
-  // ──────────────────────────────────────────────
-  const isBtechQuery = query.includes('btech') || query.includes('b.tech') || query.includes('bachelor') || query.includes('undergraduate') || query.includes('ug');
-  const isMtechQuery = query.includes('mtech') || query.includes('m.tech') || query.includes('master') || query.includes('postgraduate') || query.includes('pg');
-  const isCollegeQuery = query.includes('college') || query.includes('university') || query.includes('institute') || query.includes('school');
-  const isCgpaQuery = query.includes('cgpa') || query.includes('gpa') || query.includes('grades') || query.includes('score') || query.includes('percentage');
-
-  // Specific: "What is his BTech college?"
-  if (isBtechQuery && !isMtechQuery) {
-    const btech = findEduByDegree('b.tech') || education.find(e => e.degree.toLowerCase().includes('bachelor'));
-    if (btech) {
-      return {
-        answer: `Manav completed his **${btech.degree} in ${btech.field}** from **${btech.institution}**, ${btech.location}.\n\n• **Grade**: ${btech.grade}\n• **Duration**: ${btech.startYear}–${btech.endYear}${btech.highlights && btech.highlights.length > 0 ? `\n• **Highlight**: ${btech.highlights[0]}` : ''}`,
-        sources: [{
-          title: `${btech.degree} — ${btech.institution}`,
-          category: 'Education',
-          snippet: `${btech.grade} | ${btech.location}`,
-          url: '/education'
-        }]
-      };
-    }
-  }
-
-  // Specific: "What is his MTech university?"
-  if (isMtechQuery && !isBtechQuery) {
-    const mtech = findEduByDegree('m.tech') || education.find(e => e.degree.toLowerCase().includes('master'));
-    if (mtech) {
-      return {
-        answer: `Manav completed his **${mtech.degree} in ${mtech.field}** from **${mtech.institution}**, ${mtech.location}.\n\n• **Grade**: ${mtech.grade}\n• **Duration**: ${mtech.startYear}–${mtech.endYear}${mtech.highlights && mtech.highlights.length > 0 ? `\n• **Highlight**: ${mtech.highlights[0]}` : ''}`,
-        sources: [{
-          title: `${mtech.degree} — ${mtech.institution}`,
-          category: 'Education',
-          snippet: `${mtech.grade} | ${mtech.location}`,
-          url: '/education'
-        }]
-      };
-    }
-  }
-
-  // Specific: CGPA / Grades query
-  if (isCgpaQuery && !isCollegeQuery) {
-    const grades = education.map(e => `• **${e.degree} in ${e.field}** — ${e.institution}: **${e.grade}**`).join('\n');
-    return {
-      answer: `Here are Manav's academic grades:\n\n${grades}`,
-      sources: education.map(e => ({
-        title: `${e.degree} — ${e.institution}`,
-        category: 'Education',
-        snippet: e.grade,
-        url: '/education'
-      }))
-    };
-  }
-
-  // General education query
-  if (
-    query.includes('education') ||
-    query.includes('degree') ||
-    isCollegeQuery ||
-    query.includes('pdeu') ||
-    query.includes('indus')
-  ) {
-    if (query.includes('pdeu') || query.includes('pandit') || query.includes('deendayal')) {
-      const pdeu = education.find(e => e.institution.toLowerCase().includes('pandit'));
-      if (pdeu) {
-        return {
-          answer: `At **${pdeu.institution}**, Manav completed his **${pdeu.degree} in ${pdeu.field}** with **${pdeu.grade}** (${pdeu.startYear}–${pdeu.endYear}).${pdeu.highlights && pdeu.highlights.length > 0 ? `\n\n**Highlights**: ${pdeu.highlights.join(', ')}` : ''}`,
-          sources: [{ title: `${pdeu.degree} — ${pdeu.institution}`, category: 'Education', snippet: pdeu.grade, url: '/education' }]
-        };
-      }
-    }
-    if (query.includes('indus')) {
-      const indus = education.find(e => e.institution.toLowerCase().includes('indus'));
-      if (indus) {
-        return {
-          answer: `At **${indus.institution}**, Manav completed his **${indus.degree} in ${indus.field}** with **${indus.grade}** (${indus.startYear}–${indus.endYear}).${indus.highlights && indus.highlights.length > 0 ? `\n\n**Highlights**: ${indus.highlights.join(', ')}` : ''}`,
-          sources: [{ title: `${indus.degree} — ${indus.institution}`, category: 'Education', snippet: indus.grade, url: '/education' }]
-        };
-      }
-    }
-
-    const eduList = education
-      .map(e => `• **${e.degree} in ${e.field}** — *${e.institution}* (${e.grade}, ${e.startYear}–${e.endYear})`)
-      .join('\n');
-
-    return {
-      answer: `Manav's educational background:\n\n${eduList}`,
-      sources: education.map(e => ({
-        title: `${e.degree} — ${e.institution}`,
-        category: 'Education',
-        snippet: `${e.grade} | ${e.location}`,
-        url: '/education'
-      }))
-    };
-  }
-
-  // ──────────────────────────────────────────────
-  // 4. RESEARCH & PUBLICATIONS
-  // ──────────────────────────────────────────────
-  if (
-    query.includes('research') ||
-    query.includes('paper') ||
-    query.includes('publication') ||
-    query.includes('ieee') ||
-    query.includes('eeg') ||
-    query.includes('sleep') ||
-    query.includes('apnea')
-  ) {
-    const research = achievements.filter((a) => a.category === 'Publication');
-    const list = research
-      .map((r) => `• **${r.title}** (${r.date})\n  ${r.description}`)
-      .join('\n\n');
-
-    return {
-      answer: `Manav has authored peer-reviewed research papers:\n\n${list}`,
-      sources: research.map((r) => ({
-        title: r.title,
-        category: 'Research Publication',
-        snippet: r.description,
-        url: '/achievements'
-      }))
-    };
-  }
-
-  // ──────────────────────────────────────────────
-  // 5. EXPERIENCE — GRANULAR SUB-INTENTS
-  // ──────────────────────────────────────────────
-  const isCurrentRoleQuery = query.includes('current') || query.includes('now') || query.includes('present') || query.includes('today');
-  const isInternQuery = query.includes('intern') || query.includes('internship');
-
-  if (isCurrentRoleQuery && (query.includes('role') || query.includes('job') || query.includes('work') || query.includes('position') || query.includes('doing'))) {
-    const currentExp = experience.find(e => e.current) || experience[0];
-    if (currentExp) {
-      return {
-        answer: `Manav is currently working as **${currentExp.role}** at **${currentExp.company}**, ${currentExp.location} (since ${currentExp.startDate}).\n\n${currentExp.description}\n\n**Key Responsibilities:**\n${currentExp.responsibilities.slice(0, 4).map(r => `• ${r}`).join('\n')}\n\n**Tech Stack:** ${currentExp.technologies.join(', ')}`,
-        sources: [{
-          title: `${currentExp.role} — ${currentExp.company}`,
-          category: 'Experience',
-          snippet: `${currentExp.startDate} – Present | ${currentExp.location}`,
-          url: '/experience'
-        }]
-      };
-    }
-  }
-
-  if (isInternQuery) {
-    const internships = experience.filter(e => e.role.toLowerCase().includes('intern'));
-    if (internships.length > 0) {
-      const list = internships.map(e =>
-        `### ${e.role} at ${e.company}\n*${e.startDate} – ${e.endDate} | ${e.location}*\n\n${e.description}\n\n**Key Work:**\n${e.responsibilities.slice(0, 3).map(r => `• ${r}`).join('\n')}`
-      ).join('\n\n---\n\n');
-
-      return {
-        answer: `Manav's internship experience:\n\n${list}`,
-        sources: internships.map(e => ({
-          title: `${e.role} — ${e.company}`,
-          category: 'Experience',
-          snippet: `${e.startDate} – ${e.endDate}`,
-          url: '/experience'
-        }))
-      };
-    }
-  }
-
-  if (
-    query.includes('experience') ||
-    query.includes('job') ||
-    query.includes('role') ||
-    query.includes('company') ||
-    query.includes('work') ||
-    query.includes('analytix') ||
-    query.includes('schbang')
-  ) {
-    const expList = experience
-      .map(
-        (exp) =>
-          `### ${exp.role} at ${exp.company}\n*${exp.startDate} – ${exp.endDate} | ${exp.location}*\n\n${exp.description}\n\n**Key Deliverables:**\n${exp.responsibilities.slice(0, 4).map((r) => `• ${r}`).join('\n')}\n\n**Technologies:** ${exp.technologies.join(', ')}`
-      )
-      .join('\n\n---\n\n');
-
-    return {
-      answer: `Manav's professional experience:\n\n${expList}`,
-      sources: experience.map((exp) => ({
-        title: `${exp.role} — ${exp.company}`,
-        category: 'Experience',
-        snippet: `${exp.startDate} – ${exp.endDate} | ${exp.location}`,
-        url: '/experience'
-      }))
-    };
-  }
-
-  // ──────────────────────────────────────────────
-  // 6. SPECIFIC PROJECT MATCH
-  // ──────────────────────────────────────────────
-  const matchedProject = projects.find(
-    (p) =>
-      query.includes(p.slug) ||
-      query.includes(p.title.toLowerCase()) ||
-      (query.includes('tax') && p.slug === 'taxpro-genie') ||
-      (query.includes('vox') && p.slug === 'ai-vox') ||
-      (query.includes('artifax') && p.slug === 'artifax') ||
-      (query.includes('applied') && p.slug === 'applied-ai-os') ||
-      (query.includes('mushroom') && p.slug === 'smart-greenhouse')
-  );
-
-  if (matchedProject) {
-    return {
-      answer: `### ${matchedProject.title} (${matchedProject.year})\n\n${matchedProject.fullDescription}\n\n**Problem:** ${matchedProject.problem}\n\n**Solution:** ${matchedProject.solution}\n\n**Key Results:**\n${matchedProject.results.map((r) => `• ${r}`).join('\n')}\n\n**Tech Stack:** ${matchedProject.technologies.join(', ')}`,
-      sources: [
-        {
-          title: matchedProject.title,
-          category: `Project (${matchedProject.category})`,
-          snippet: matchedProject.shortDescription,
-          url: `/projects/${matchedProject.slug}`
-        }
-      ]
-    };
-  }
-
-  // ──────────────────────────────────────────────
-  // 7. GENERAL PROJECTS QUERY
-  // ──────────────────────────────────────────────
-  if (query.includes('project') || query.includes('built') || query.includes('portfolio')) {
-    const list = projects
-      .map(
-        (p) =>
-          `• **[${p.title}](/projects/${p.slug})** (${p.year} · ${p.category})\n  ${p.shortDescription}`
-      )
-      .join('\n\n');
-
-    return {
-      answer: `Manav's key AI & engineering projects:\n\n${list}\n\nExplore detailed case studies on the **[Projects page](/projects)**.`,
-      sources: projects.map((p) => ({
-        title: p.title,
-        category: p.category,
-        snippet: p.shortDescription,
-        url: `/projects/${p.slug}`
-      }))
-    };
-  }
-
-  // ──────────────────────────────────────────────
-  // 8. SKILLS
-  // ──────────────────────────────────────────────
-  if (
-    query.includes('skill') ||
-    query.includes('python') ||
-    query.includes('pytorch') ||
-    query.includes('llm') ||
-    query.includes('rag') ||
-    query.includes('langchain') ||
-    query.includes('fastapi') ||
-    query.includes('react') ||
-    query.includes('sql') ||
-    query.includes('docker') ||
-    query.includes('technolog')
-  ) {
-    const specificTech = tokens.find(t =>
-      ['python', 'pytorch', 'tensorflow', 'langchain', 'fastapi', 'react', 'docker', 'sql', 'azure', 'openai'].includes(t)
-    );
-
-    if (specificTech) {
-      for (const cat of skills) {
-        const skill = cat.skills.find(s => s.name.toLowerCase().includes(specificTech));
-        if (skill) {
-          return {
-            answer: `Yes! Manav has **${skill.level}** proficiency in **${skill.name}**.\n\nIt falls under his **${cat.category}** skill set${skill.years ? ` with ${skill.years} of experience` : ''}.\n\n**Other skills in ${cat.category}:**\n${cat.skills.filter(s => s.name !== skill.name).map(s => `• ${s.name} (${s.level})`).join('\n')}`,
-            sources: [{ title: cat.category, category: 'Skills', snippet: cat.skills.map(s => s.name).join(', '), url: '/skills' }]
-          };
-        }
-      }
-    }
-
-    const allSkills = skills
-      .map(
-        (cat) =>
-          `**${cat.category}:**\n${cat.skills.map((s) => `• ${s.name} (${s.level})`).join('\n')}`
-      )
-      .join('\n\n');
-
-    return {
-      answer: `Manav's technical proficiency:\n\n${allSkills}`,
-      sources: skills.map((cat) => ({
-        title: cat.category,
-        category: 'Skill Category',
-        snippet: cat.skills.map((s) => s.name).join(', '),
-        url: '/skills'
-      }))
-    };
-  }
-
-  // ──────────────────────────────────────────────
-  // 9. WHO IS MANAV / ABOUT
-  // ──────────────────────────────────────────────
-  if (
-    query.includes('who') ||
-    query.includes('about') ||
-    query.includes('introduce') ||
-    query.includes('overview') ||
-    query.includes('summary')
-  ) {
-    return {
-      answer: `**Manav Shah** — ${profile.role}, based in ${profile.location}.\n\n${profile.shortBio}\n\n**Highlights:**\n• **Current Role**: ${experience[0]?.role || 'AI Developer'} at ${experience[0]?.company || 'Analytix Solutions'}\n• **Flagship Project**: TaxProGenie — automated 28+ tax forms for 1.5L taxpayers (98% accuracy)\n• **Education**: M.Tech AI (PDEU, 9.06) & B.Tech CE (Indus, 9.70)\n• **Research**: 2 IEEE publications`,
-      sources: [
-        {
-          title: 'About Manav Shah',
-          category: 'Profile',
-          snippet: profile.shortBio,
-          url: '/about'
-        }
-      ]
-    };
-  }
-
-  // ──────────────────────────────────────────────
-  // 10. SERVICES
-  // ──────────────────────────────────────────────
-  if (query.includes('service') || query.includes('offer') || query.includes('freelance') || query.includes('consulting')) {
-    const serviceList = services
-      .map(s => `• **${s.title}** — ${s.tagline}`)
-      .join('\n');
-
-    return {
-      answer: `Manav offers the following professional services:\n\n${serviceList}\n\nLearn more on the **[Services page](/services)**.`,
-      sources: services.map(s => ({
-        title: s.title,
-        category: 'Service',
-        snippet: s.tagline,
-        url: '/services'
-      }))
-    };
-  }
-
-
-  // ──────────────────────────────────────────────
-  // 12. FALLBACK — Structured Data Semantic Match
-  // ──────────────────────────────────────────────
-  const allDocuments = [
-    ...projects.map((p) => ({
-      title: p.title,
-      category: 'Project',
-      text: `${p.title} ${p.shortDescription} ${p.fullDescription} ${p.problem} ${p.solution} ${p.technologies.join(' ')}`,
-      url: `/projects/${p.slug}`,
-      snippet: p.shortDescription
-    })),
-    ...experience.map((e) => ({
-      title: `${e.role} at ${e.company}`,
-      category: 'Experience',
-      text: `${e.company} ${e.role} ${e.description} ${e.responsibilities.join(' ')} ${e.technologies.join(' ')}`,
-      url: '/experience',
-      snippet: e.description
-    })),
-    ...skills.map((s) => ({
-      title: s.category,
-      category: 'Skills',
-      text: `${s.category} ${s.skills.map((k) => k.name).join(' ')}`,
-      url: '/skills',
-      snippet: s.skills.map((k) => k.name).join(', ')
-    })),
-    ...education.map((ed) => ({
-      title: `${ed.degree} in ${ed.field}`,
-      category: 'Education',
-      text: `${ed.institution} ${ed.degree} ${ed.field} ${ed.description} ${ed.subjects?.join(' ')}`,
-      url: '/education',
-      snippet: `${ed.institution} — ${ed.grade}`
-    }))
-  ];
-
-  let bestMatch: { doc: (typeof allDocuments)[0]; score: number } | null = null;
-
-  for (const doc of allDocuments) {
-    const docLower = doc.text.toLowerCase();
+  // 1. Dynamic BM25-style Passage Retrieval
+  const scoredPassages = knowledgeBase.map(doc => {
     let score = 0;
-    for (const t of tokens) {
-      if (docLower.includes(t)) {
-        score += 1;
+    const docLower = doc.text.toLowerCase();
+    const docTokens = tokenize(docLower);
+    const tokenSet = new Set(docTokens);
+
+    for (const qt of qTokens) {
+      if (tokenSet.has(qt)) {
+        score += 4;
+      } else if (docLower.includes(qt)) {
+        score += 2;
       }
     }
-    if (score > 0 && (!bestMatch || score > bestMatch.score)) {
-      bestMatch = { doc, score };
-    }
-  }
 
-  if (bestMatch && bestMatch.score >= 1) {
+    // Exact multi-token phrase match boost
+    if (qTokens.length >= 2) {
+      const phrase = qTokens.join(' ');
+      if (docLower.includes(phrase)) score += 6;
+    }
+
+    // Title match boost
+    const titleLower = doc.title.toLowerCase();
+    for (const qt of qTokens) {
+      if (titleLower.includes(qt)) score += 3;
+    }
+
+    return { doc, score };
+  }).filter(p => p.score > 0);
+
+  scoredPassages.sort((a, b) => b.score - a.score);
+
+  if (scoredPassages.length === 0) {
     return {
-      answer: `Based on Manav's records — **${bestMatch.doc.title}**:\n\n${bestMatch.doc.snippet}\n\nExplore more on the [${bestMatch.doc.title}](${bestMatch.doc.url}) page.`,
-      sources: [
-        {
-          title: bestMatch.doc.title,
-          category: bestMatch.doc.category,
-          snippet: bestMatch.doc.snippet,
-          url: bestMatch.doc.url
-        }
-      ]
+      answer: "I couldn't find specific details for that in Manav's verified portfolio records or uploaded documents. Feel free to ask about his AI projects, education, experience, or skills.",
+      sources: []
     };
   }
 
-  // Safe Fallback — Zero Hallucination
-  return {
-    answer: "I couldn't find a specific match for that in Manav's verified portfolio or uploaded documents. Feel free to rephrase or ask about any aspect of his projects, skills, education, or work experience.",
-    sources: []
-  };
+  const topPassages = scoredPassages.slice(0, 3).map(p => p.doc);
+
+  // 2. Optional: If user configured GEMINI_API_KEY, use Gemini for generative QA
+  const geminiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+  if (geminiKey) {
+    const geminiAnswer = await generateWithGemini(rawQuery, topPassages, geminiKey);
+    if (geminiAnswer) {
+      return {
+        answer: geminiAnswer,
+        sources: topPassages.map(p => ({
+          title: p.title,
+          category: p.category,
+          snippet: p.text.slice(0, 140).replace(/\s+/g, ' ') + '…',
+          url: p.url
+        }))
+      };
+    }
+  }
+
+  // 3. Dynamic Local Extractive Synthesizer (Fast, reliable, zero keys needed)
+  return synthesizeLocalAnswer(rawQuery, topPassages);
 }

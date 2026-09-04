@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const query = body.query || '';
-    const result = queryPortfolioAssistant(query);
+    const result = await queryPortfolioAssistant(query);
     return NextResponse.json(result);
   } catch (error) {
     console.error('Assistant API error:', error);
